@@ -10,6 +10,7 @@ export function HeroSection() {
   const setPhoto       = useAppStore(s => s.setUploadedPhoto);
   const setPreloaded   = useAppStore(s => s.setPreloadedResult);
   const setSpotlight   = useAppStore(s => s.setSpotlight);
+  const spotlight      = useAppStore(s => s.spotlight);
 
   const handleStartScan = (photoUrl) => {
     setSpotlight(false);
@@ -21,7 +22,10 @@ export function HeroSection() {
   return (
     <section className="hero-section" style={{
       background: `linear-gradient(165deg, ${colors.blue} 0%, ${colors.darkBlue} 60%, #1478a0 100%)`,
-      padding: "110px 24px 44px", position: "relative", overflow: "hidden",
+      padding: "110px 24px 44px", position: "relative",
+      // overflow visible cuando spotlight está activo para que el recuadro
+      // pueda subir por encima del overlay sin quedar recortado
+      overflow: spotlight ? "visible" : "hidden",
     }}>
       <div style={{ position: "absolute", top: 60, left: "-5%", width: 350, height: 350, borderRadius: "50%", background: `radial-gradient(circle, ${colors.yellow}12, transparent 65%)`, filter: "blur(50px)" }} />
       <div style={{ position: "absolute", bottom: 40, right: "-5%", width: 250, height: 250, borderRadius: "50%", background: `radial-gradient(circle, ${colors.pink}10, transparent 65%)`, filter: "blur(40px)" }} />
@@ -68,7 +72,11 @@ export function HeroSection() {
 
         <div className="hero-visual" style={{
           flex: "0 0 auto", display: "flex", alignItems: "center", justifyContent: "center",
-          animation: "fadeIn 0.9s ease-out", position: "relative",
+          animation: "fadeIn 0.9s ease-out",
+          position: "relative",
+          zIndex: spotlight ? 1001 : "auto",
+          transform: spotlight ? "scale(1.03)" : "scale(1)",
+          transition: "transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
         }}>
           <HeroUpload onStartScan={handleStartScan} onSpotlight={setSpotlight} />
         </div>
