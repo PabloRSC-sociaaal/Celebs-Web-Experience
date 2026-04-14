@@ -23,6 +23,282 @@ const DICE_OPTIONS = [
   { emoji: "💘", text: "your Platonic Love", color: "#FF6B9D",  label: "love",    sub: null },
 ];
 
+// ─── Camino a la Fama — step hints ──────────────────────────────────────────
+const STEPS_REQUIRED = 10;
+const STEP_HINTS = [
+  { emoji: "🙋", text: "You",        color: C.cyan    },
+  { emoji: "👨", text: "Dad",        color: C.pink    },
+  { emoji: "👩", text: "Mom",        color: C.pink    },
+  { emoji: "👫", text: "Friend",     color: C.green   },
+  { emoji: "👦", text: "Brother",    color: C.pink    },
+  { emoji: "👧", text: "Sister",     color: C.pink    },
+  { emoji: "🧑‍💻", text: "Colleague", color: C.blue    },
+  { emoji: "📚", text: "Teacher",    color: C.purple  },
+  { emoji: "💘", text: "Crush",      color: "#FF6B9D" },
+  { emoji: "👔", text: "Boss",       color: C.blue    },
+];
+
+// ─── Gang Reveal modal ────────────────────────────────────────────────────────
+function GangReveal({ gens, onClose }) {
+  const top10  = gens.slice(0, STEPS_REQUIRED);
+  const avgPct = Math.round(top10.reduce((a, g) => a + (g.celeb?.pct || 0), 0) / top10.length);
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 500,
+      background: "rgba(5,5,18,0.96)", backdropFilter: "blur(20px)",
+      display: "flex", flexDirection: "column", overflowY: "auto",
+      fontFamily: "'Oxanium', sans-serif",
+    }}>
+      <style>{`
+        @keyframes gangIn   { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes starGlow { 0%,100%{filter:drop-shadow(0 0 8px ${C.yellow})} 50%{filter:drop-shadow(0 0 20px ${C.yellow})} }
+      `}</style>
+
+      {/* Close bar */}
+      <div style={{ padding:"14px 16px", display:"flex", justifyContent:"flex-end" }}>
+        <button onClick={onClose} style={{
+          background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.12)",
+          borderRadius:10, padding:"8px 16px", cursor:"pointer",
+          fontFamily:"'Oxanium'", fontWeight:600, fontSize:12, color:"rgba(255,255,255,0.6)",
+        }}>✕ Close</button>
+      </div>
+
+      <div style={{
+        maxWidth:580, margin:"0 auto", padding:"8px 16px 80px",
+        display:"flex", flexDirection:"column", alignItems:"center", gap:24,
+        animation:"gangIn 0.5s ease-out",
+      }}>
+        {/* Title */}
+        <div style={{ textAlign:"center" }}>
+          <div style={{ fontSize:48, lineHeight:1, animation:"starGlow 2s ease-in-out infinite" }}>🌟</div>
+          <div style={{ fontFamily:"'Fredoka'", fontSize:"clamp(28px,7vw,40px)", fontWeight:700, color:C.yellow, marginTop:8, lineHeight:1 }}>
+            Your Celebrity Gang
+          </div>
+          <div style={{ fontFamily:"'Oxanium'", fontSize:12, color:"rgba(255,255,255,0.4)", marginTop:8, lineHeight:1.5 }}>
+            {top10.length} people matched · {avgPct}% avg Hollywood score
+          </div>
+        </div>
+
+        {/* Gang grid */}
+        <div style={{
+          display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(90px,1fr))", gap:10, width:"100%",
+        }}>
+          {top10.map((gen, i) => (
+            <div key={gen.id} style={{
+              background:"#111122", borderRadius:14, overflow:"hidden",
+              border:`1.5px solid ${gen.celeb?.color || C.yellow}44`,
+              animation:`gangIn 0.4s ease-out ${i * 0.06}s both`,
+            }}>
+              <div style={{ position:"relative", aspectRatio:"1/1" }}>
+                {gen.thumb
+                  ? <img src={gen.thumb} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"top center", display:"block" }} />
+                  : <div style={{ width:"100%", height:"100%", background:"#1a1a2e", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28 }}>👤</div>
+                }
+                <div style={{ position:"absolute", inset:0, background:"linear-gradient(transparent 40%, rgba(0,0,0,0.7))" }} />
+                <div style={{
+                  position:"absolute", top:4, right:4,
+                  background:gen.celeb?.color || C.yellow,
+                  color: gen.celeb?.color === C.yellow ? C.black : C.white,
+                  fontFamily:"'Fredoka'", fontWeight:700, fontSize:9,
+                  padding:"2px 6px", borderRadius:6,
+                }}>{gen.celeb?.pct}%</div>
+              </div>
+              <div style={{ padding:"6px 8px 8px" }}>
+                <div style={{
+                  fontFamily:"'Oxanium'", fontSize:9, fontWeight:700, color:gen.celeb?.color || C.yellow,
+                  overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap",
+                }}>{gen.celeb?.name}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Gang score */}
+        <div style={{
+          background:`${C.yellow}10`, border:`1.5px solid ${C.yellow}33`,
+          borderRadius:18, padding:"20px 24px", textAlign:"center", width:"100%",
+          boxShadow:`0 0 30px ${C.yellow}10`,
+        }}>
+          <div style={{ fontFamily:"'Fredoka'", fontSize:48, fontWeight:700, color:C.yellow, lineHeight:1 }}>
+            {avgPct}%
+          </div>
+          <div style={{ fontFamily:"'Oxanium'", fontSize:12, color:"rgba(255,255,255,0.45)", marginTop:6 }}>
+            Average celebrity match across your entire gang
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div style={{ display:"flex", gap:10, flexWrap:"wrap", justifyContent:"center", width:"100%" }}>
+          <button style={{
+            flex:"1 1 160px", background:C.yellow, color:C.black,
+            fontFamily:"'Oxanium'", fontWeight:800, fontSize:13,
+            padding:"14px 0", border:`3px solid ${C.black}`,
+            borderRadius:12, boxShadow:`4px 4px 0 ${C.black}`,
+            cursor:"pointer", letterSpacing:1, textTransform:"uppercase",
+          }}>🔗 Share my Gang</button>
+          <button onClick={onClose} style={{
+            flex:"1 1 120px", background:"transparent",
+            border:"1px solid rgba(255,255,255,0.15)",
+            borderRadius:12, padding:"14px 0",
+            fontFamily:"'Oxanium'", fontWeight:600, fontSize:13,
+            color:"rgba(255,255,255,0.45)", cursor:"pointer",
+          }}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Camino a la Fama — journey tracker ──────────────────────────────────────
+function CaminoALaFama({ gens, onNew, onReveal }) {
+  const filled     = Math.min(gens.length, STEPS_REQUIRED);
+  const pct        = (filled / STEPS_REQUIRED) * 100;
+  const isUnlocked = gens.length >= STEPS_REQUIRED;
+  const filledGens = gens.slice(0, STEPS_REQUIRED);
+
+  return (
+    <div style={{
+      gridColumn:"span 2",
+      background:"linear-gradient(135deg,#0c0c1e 0%,#111128 100%)",
+      border:`2px solid ${isUnlocked ? `${C.yellow}55` : "rgba(255,255,255,0.07)"}`,
+      borderRadius:20, overflow:"hidden",
+      transition:"border-color 0.5s ease, box-shadow 0.5s ease",
+      boxShadow: isUnlocked ? `0 0 32px ${C.yellow}14` : "none",
+    }}>
+      {/* Header */}
+      <div style={{ padding:"14px 16px 10px", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+          <div>
+            <div style={{ fontFamily:"'Fredoka'", fontSize:17, fontWeight:700, color:C.white, lineHeight:1 }}>
+              🌟 Camino a la Fama
+            </div>
+            <div style={{ fontFamily:"'Oxanium'", fontSize:10, color:"rgba(255,255,255,0.35)", marginTop:3 }}>
+              Build your celebrity gang · upload {STEPS_REQUIRED} people
+            </div>
+          </div>
+          <div style={{
+            fontFamily:"'Fredoka'", fontSize:20, fontWeight:700, lineHeight:1, flexShrink:0,
+            color: isUnlocked ? C.yellow : "rgba(255,255,255,0.2)",
+          }}>
+            {filled}<span style={{ fontSize:13, fontWeight:400, color:"rgba(255,255,255,0.2)" }}>/{STEPS_REQUIRED}</span>
+          </div>
+        </div>
+        {/* Progress bar */}
+        <div style={{ marginTop:10, height:4, borderRadius:2, background:"rgba(255,255,255,0.07)", overflow:"hidden" }}>
+          <div style={{
+            height:"100%", borderRadius:2, transition:"width 0.6s ease",
+            width:`${pct}%`,
+            background: isUnlocked
+              ? `linear-gradient(90deg, ${C.yellow}, ${C.green})`
+              : `linear-gradient(90deg, ${C.blue}, ${C.cyan})`,
+            boxShadow: isUnlocked ? `0 0 8px ${C.yellow}88` : "none",
+          }} />
+        </div>
+      </div>
+
+      {/* Steps scroll */}
+      <div style={{
+        display:"flex", gap:8, overflowX:"auto", padding:"12px 16px 10px",
+        scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch",
+        scrollbarWidth:"none", msOverflowStyle:"none",
+      }}>
+        {[...Array(STEPS_REQUIRED)].map((_, i) => {
+          const gen  = filledGens[i];
+          const hint = STEP_HINTS[i];
+          return (
+            <div key={i} style={{
+              flexShrink:0, scrollSnapAlign:"start",
+              width:72, display:"flex", flexDirection:"column", alignItems:"center", gap:4,
+            }}>
+              {gen ? (
+                // Filled slot
+                <div style={{
+                  width:68, height:68, borderRadius:14, overflow:"hidden", position:"relative",
+                  border:`2px solid ${gen.celeb?.color || C.yellow}`,
+                  boxShadow:`0 0 10px ${gen.celeb?.color || C.yellow}33`,
+                }}>
+                  {gen.thumb
+                    ? <img src={gen.thumb} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"top center" }} />
+                    : <div style={{ width:"100%", height:"100%", background:"#1a1a2e", display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>👤</div>
+                  }
+                  <div style={{
+                    position:"absolute", top:2, right:2,
+                    background:gen.celeb?.color || C.yellow,
+                    color:gen.celeb?.color === C.yellow ? C.black : C.white,
+                    fontFamily:"'Fredoka'", fontWeight:700, fontSize:8,
+                    padding:"1px 4px", borderRadius:5,
+                  }}>{gen.celeb?.pct}%</div>
+                </div>
+              ) : (
+                // Empty slot
+                <div
+                  onClick={onNew}
+                  style={{
+                    width:68, height:68, borderRadius:14,
+                    border:"2px dashed rgba(255,255,255,0.1)",
+                    background:"rgba(255,255,255,0.02)",
+                    display:"flex", flexDirection:"column", alignItems:"center",
+                    justifyContent:"center", gap:1, cursor:"pointer", transition:"all 0.2s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor=hint.color; e.currentTarget.style.background=`${hint.color}12`; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor="rgba(255,255,255,0.1)"; e.currentTarget.style.background="rgba(255,255,255,0.02)"; }}
+                >
+                  <span style={{ fontSize:20 }}>{hint.emoji}</span>
+                  <span style={{ fontFamily:"'Oxanium'", fontSize:9, color:"rgba(255,255,255,0.25)", fontWeight:600 }}>+</span>
+                </div>
+              )}
+              {/* Label */}
+              <div style={{
+                fontFamily:"'Oxanium'", fontSize:9, fontWeight:600, letterSpacing:0.2,
+                color: gen ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.18)",
+                textAlign:"center", maxWidth:68,
+                overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap",
+              }}>
+                {gen ? gen.celeb?.name?.split(" ")[0] : hint.text}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* CTA footer */}
+      <div style={{
+        padding:"10px 16px 14px", borderTop:"1px solid rgba(255,255,255,0.05)",
+        display:"flex", alignItems:"center", justifyContent:"space-between", gap:10,
+      }}>
+        {isUnlocked ? (
+          <>
+            <div style={{ fontFamily:"'Oxanium'", fontSize:11, color:C.yellow, fontWeight:600 }}>
+              ✨ Gang complete!
+            </div>
+            <button onClick={onReveal} style={{
+              background:C.yellow, color:C.black,
+              fontFamily:"'Oxanium'", fontWeight:800, fontSize:11,
+              padding:"9px 16px", border:`2px solid ${C.black}`,
+              borderRadius:10, boxShadow:`3px 3px 0 ${C.black}`,
+              cursor:"pointer", letterSpacing:0.8, textTransform:"uppercase",
+              display:"flex", alignItems:"center", gap:5, whiteSpace:"nowrap",
+            }}>🌟 Reveal Gang</button>
+          </>
+        ) : (
+          <>
+            <div style={{ fontFamily:"'Oxanium'", fontSize:10, color:"rgba(255,255,255,0.3)" }}>
+              🔒 {STEPS_REQUIRED - filled} more step{STEPS_REQUIRED - filled !== 1 ? "s" : ""} to unlock Gang Reveal
+            </div>
+            <button onClick={onNew} style={{
+              background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.12)",
+              borderRadius:10, padding:"7px 12px", cursor:"pointer",
+              fontFamily:"'Oxanium'", fontWeight:700, fontSize:10,
+              color:"rgba(255,255,255,0.45)", whiteSpace:"nowrap",
+            }}>+ Add step</button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Dice CTA card ────────────────────────────────────────────────────────────
 function DiceCard({ onNew }) {
   const [phase, setPhase]     = useState("idle");   // idle | rolling | landed
@@ -68,7 +344,7 @@ function DiceCard({ onNew }) {
       background: `linear-gradient(135deg, #111122 0%, #0d0d1a 100%)`,
       border: `2px solid ${accentColor}44`,
       borderRadius: 24,
-      padding: "28px 24px",
+      padding: "clamp(16px, 4vw, 28px) clamp(14px, 3vw, 24px)",
       display: "flex", flexDirection: "column", alignItems: "center",
       gap: 20, position: "relative", overflow: "hidden",
       boxShadow: phase === "landed" ? `0 0 40px ${accentColor}22` : "none",
@@ -490,11 +766,10 @@ function EmptyState({ onNew }) {
 
 // ─── Dashboard main ───────────────────────────────────────────────────────────
 export default function DashboardPage({ onNew, onViewResult, onBack }) {
-  const [gens, setGens] = useState([]);
+  const [gens, setGens]               = useState([]);
+  const [showGangReveal, setGangReveal] = useState(false);
 
-  useEffect(() => {
-    setGens(getAll());
-  }, []);
+  useEffect(() => { setGens(getAll()); }, []);
 
   const handleDelete = (id) => {
     deleteGeneration(id);
@@ -516,11 +791,14 @@ export default function DashboardPage({ onNew, onViewResult, onBack }) {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-        .gen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-        @media(max-width:600px) { .gen-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
-        @media(max-width:380px) { .gen-grid { grid-template-columns: 1fr; } }
+        .gen-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+        @media(min-width:600px) { .gen-grid { gap:16px; } }
+        @media(min-width:768px) { .gen-grid { grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:16px; } }
         .gen-card:hover .card-play { opacity: 1 !important; }
-        @media(max-width:480px) { .dice-card-span { grid-column: span 2 !important; } }
+        .dash-header-inner { display:flex; justify-content:space-between; align-items:center; gap:10px; max-width:900px; margin:0 auto; }
+        .dash-new-btn-text { display:none; }
+        @media(min-width:480px) { .dash-new-btn-text { display:inline; } }
+        @keyframes ctaPulse { 0%,100%{box-shadow:0 0 0 0 rgba(255,229,0,0.5)} 50%{box-shadow:0 0 0 8px rgba(255,229,0,0)} }
       `}</style>
 
       {/* ── Header ── */}
@@ -528,73 +806,73 @@ export default function DashboardPage({ onNew, onViewResult, onBack }) {
         position: "sticky", top: 0, zIndex: 100,
         background: "rgba(10,10,10,0.92)", backdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(255,255,255,0.07)",
-        padding: "14px 20px",
+        padding: "10px 16px",
       }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          {/* Logo + title */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            <button onClick={onBack} style={{
-              background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
-              borderRadius: 10, padding: "7px 14px", cursor: "pointer",
-              fontFamily: "'Oxanium'", fontWeight: 600, fontSize: 12, color: "rgba(255,255,255,0.6)",
-              display: "flex", alignItems: "center", gap: 5,
-            }}>← Back</button>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div style={{ fontFamily: "'Fredoka'", fontSize: 18, fontWeight: 700, color: C.white, lineHeight: 1 }}>
-                My Generations
-              </div>
-              <div style={{ fontFamily: "'Oxanium'", fontSize: 11, color: "rgba(255,255,255,0.35)", marginTop: 2 }}>
-                {gens.length} result{gens.length !== 1 ? "s" : ""} saved
-              </div>
+        <div className="dash-header-inner">
+          {/* Back */}
+          <button onClick={onBack} style={{
+            background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: 10, padding: "8px 12px", cursor: "pointer",
+            fontFamily: "'Oxanium'", fontWeight: 600, fontSize: 12, color: "rgba(255,255,255,0.6)",
+            display: "flex", alignItems: "center", gap: 4, flexShrink: 0,
+          }}>← Back</button>
+
+          {/* Title */}
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"center", flex:1, minWidth:0 }}>
+            <div style={{ fontFamily:"'Fredoka'", fontSize:16, fontWeight:700, color:C.white, lineHeight:1, whiteSpace:"nowrap" }}>
+              My Generations
+            </div>
+            <div style={{ fontFamily:"'Oxanium'", fontSize:10, color:"rgba(255,255,255,0.35)", marginTop:2 }}>
+              {gens.length} result{gens.length !== 1 ? "s" : ""} saved
             </div>
           </div>
 
-          {/* New photo CTA */}
+          {/* New photo */}
           <button onClick={onNew} style={{
             background: C.yellow, color: C.black,
-            fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 13,
-            padding: "10px 20px", border: `2px solid ${C.black}`,
-            borderRadius: 12, boxShadow: `3px 3px 0 ${C.black}`,
-            cursor: "pointer", letterSpacing: 1, textTransform: "uppercase",
-            display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap",
-          }}>📸 New photo</button>
+            fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 12,
+            padding: "9px 14px", border: `2px solid ${C.black}`,
+            borderRadius: 10, boxShadow: `3px 3px 0 ${C.black}`,
+            cursor: "pointer", letterSpacing: 0.8, textTransform: "uppercase",
+            display: "flex", alignItems: "center", gap: 5, whiteSpace: "nowrap", flexShrink: 0,
+          }}>📸 <span className="dash-new-btn-text">New photo</span></button>
         </div>
       </div>
 
+      {/* ── Gang Reveal modal ── */}
+      {showGangReveal && <GangReveal gens={gens} onClose={() => setGangReveal(false)} />}
+
       {/* ── Content ── */}
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 20px 60px" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "16px 16px 80px" }}>
         {gens.length === 0 ? (
           <EmptyState onNew={onNew} />
         ) : (
           <>
-            {/* Stats bar */}
+            {/* Discreet stats strip */}
             <div style={{
-              display: "flex", gap: 16, marginBottom: 28, flexWrap: "wrap",
-              animation: "slideUp 0.4s ease-out",
+              display:"flex", gap:16, padding:"0 0 12px",
+              borderBottom:"1px solid rgba(255,255,255,0.05)", marginBottom:14,
+              flexWrap:"wrap", animation:"slideUp 0.4s ease-out",
             }}>
               {[
-                { label: "Generations", value: gens.length },
-                { label: "Best match", value: Math.max(...gens.map(g => g.celeb?.pct || 0)) + "%" },
-                { label: "Celebrities", value: new Set(gens.map(g => g.celeb?.name)).size },
-                { label: "Tagged", value: gens.filter(g => g.label).length },
-              ].map(stat => (
-                <div key={stat.label} style={{
-                  background: "#111122", border: "1px solid rgba(255,255,255,0.07)",
-                  borderRadius: 14, padding: "12px 20px", flex: "1 1 100px",
-                }}>
-                  <div style={{ fontFamily: "'Fredoka'", fontSize: 22, fontWeight: 700, color: C.yellow }}>
-                    {stat.value}
-                  </div>
-                  <div style={{ fontFamily: "'Oxanium'", fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
-                    {stat.label}
-                  </div>
-                </div>
+                { value: gens.length,                                                          label: "saved"      },
+                { value: Math.max(...gens.map(g => g.celeb?.pct || 0)) + "%",                 label: "best match" },
+                { value: new Set(gens.map(g => g.celeb?.name)).size,                          label: "celebs"     },
+                { value: gens.filter(g => g.label).length,                                    label: "tagged"     },
+              ].map(s => (
+                <span key={s.label} style={{ display:"flex", alignItems:"baseline", gap:4 }}>
+                  <span style={{ fontFamily:"'Fredoka'", fontSize:14, fontWeight:700, color:C.yellow }}>{s.value}</span>
+                  <span style={{ fontFamily:"'Oxanium'", fontSize:10, color:"rgba(255,255,255,0.25)" }}>{s.label}</span>
+                </span>
               ))}
             </div>
 
-            {/* Grid */}
+            {/* Grid — games first, then generations */}
             <div className="gen-grid" style={{ animation: "slideUp 0.5s ease-out 0.1s both" }}>
-              {/* Dice CTA — always first */}
+              {/* Game 1: Camino a la Fama */}
+              <CaminoALaFama gens={gens} onNew={onNew} onReveal={() => setGangReveal(true)} />
+
+              {/* Game 2: Dice CTA */}
               <DiceCard onNew={onNew} />
 
               {gens.map(gen => (
