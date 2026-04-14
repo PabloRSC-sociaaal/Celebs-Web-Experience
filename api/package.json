@@ -1,0 +1,15 @@
+{
+  "name": "celebs-api",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Celebs API — swappable backend for the web app",
+  "scripts": {
+    "dev":   "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "cors":    "^2.8.5",
+    "dotenv":  "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
