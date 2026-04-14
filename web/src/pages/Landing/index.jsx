@@ -39,7 +39,7 @@ export function LandingPage() {
   }, []);
 
   return (
-    <div style={{ fontFamily: fonts.body, background: colors.black, color: colors.white, overflowX: "hidden", minHeight: "100vh" }}>
+    <div style={{ fontFamily: fonts.body, background: colors.black, color: colors.white, overflowX: "clip", minHeight: "100vh" }}>
       <style>{globalCSS}</style>
 
       {/* Spotlight overlay */}
