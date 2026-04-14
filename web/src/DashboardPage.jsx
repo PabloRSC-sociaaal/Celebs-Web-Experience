@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { getAll, updateLabel, deleteGeneration } from "./services";
 
 const C = {
@@ -6,6 +6,206 @@ const C = {
   pink: "#FF3CAC", cyan: "#00E5FF", green: "#22c55e", purple: "#8B5CF6",
   darkBlue: "#1B8DBF",
 };
+
+// ─── Dice options — all uploadable subjects ──────────────────────────────────
+const DICE_OPTIONS = [
+  { emoji: "🙋", text: "yourself",           color: C.cyan,     label: "me",      sub: null },
+  { emoji: "👨", text: "your Dad",           color: C.pink,     label: "family",  sub: "dad" },
+  { emoji: "👩", text: "your Mom",           color: C.pink,     label: "family",  sub: "mom" },
+  { emoji: "👦", text: "your Brother",       color: C.pink,     label: "family",  sub: "brother" },
+  { emoji: "👧", text: "your Sister",        color: C.pink,     label: "family",  sub: "sister" },
+  { emoji: "👶", text: "your Son",           color: C.pink,     label: "family",  sub: "son" },
+  { emoji: "🧒", text: "your Daughter",      color: C.pink,     label: "family",  sub: "daughter" },
+  { emoji: "👫", text: "a Friend",           color: C.green,    label: "friend",  sub: null },
+  { emoji: "📚", text: "a Teacher",          color: C.purple,   label: "teacher", sub: null },
+  { emoji: "🧑‍💻", text: "a Colleague",      color: C.blue,     label: "work",    sub: "colleague" },
+  { emoji: "👔", text: "your Boss",          color: C.blue,     label: "work",    sub: "boss" },
+  { emoji: "💘", text: "your Platonic Love", color: "#FF6B9D",  label: "love",    sub: null },
+];
+
+// ─── Dice CTA card ────────────────────────────────────────────────────────────
+function DiceCard({ onNew }) {
+  const [phase, setPhase]     = useState("idle");   // idle | rolling | landed
+  const [current, setCurrent] = useState(DICE_OPTIONS[0]);
+  const [result, setResult]   = useState(null);
+  const rollRef               = useRef(null);
+
+  const roll = useCallback(() => {
+    if (phase === "rolling") return;
+    setPhase("rolling");
+    setResult(null);
+
+    const TOTAL_MS  = 1600;
+    const intervals = [60, 60, 80, 80, 100, 120, 140, 160, 200]; // ease-out cadence
+    let elapsed = 0;
+    let idx = 0;
+
+    const tick = () => {
+      setCurrent(DICE_OPTIONS[Math.floor(Math.random() * DICE_OPTIONS.length)]);
+      elapsed += intervals[Math.min(idx, intervals.length - 1)];
+      idx++;
+      if (elapsed < TOTAL_MS) {
+        rollRef.current = setTimeout(tick, intervals[Math.min(idx, intervals.length - 1)]);
+      } else {
+        const winner = DICE_OPTIONS[Math.floor(Math.random() * DICE_OPTIONS.length)];
+        setCurrent(winner);
+        setResult(winner);
+        setPhase("landed");
+      }
+    };
+    rollRef.current = setTimeout(tick, intervals[0]);
+  }, [phase]);
+
+  useEffect(() => () => clearTimeout(rollRef.current), []);
+
+  const reset = () => { setPhase("idle"); setResult(null); setCurrent(DICE_OPTIONS[0]); };
+
+  const accentColor = phase === "landed" && result ? result.color : C.yellow;
+
+  return (
+    <div style={{
+      gridColumn: "span 2",
+      background: `linear-gradient(135deg, #111122 0%, #0d0d1a 100%)`,
+      border: `2px solid ${accentColor}44`,
+      borderRadius: 24,
+      padding: "28px 24px",
+      display: "flex", flexDirection: "column", alignItems: "center",
+      gap: 20, position: "relative", overflow: "hidden",
+      boxShadow: phase === "landed" ? `0 0 40px ${accentColor}22` : "none",
+      transition: "box-shadow 0.5s ease, border-color 0.4s ease",
+      minHeight: 220,
+    }}>
+      <style>{`
+        @keyframes diceFlip {
+          0%   { transform: rotateY(0deg)   scale(1);    opacity: 1; }
+          49%  { transform: rotateY(90deg)  scale(0.85); opacity: 0; }
+          50%  { transform: rotateY(-90deg) scale(0.85); opacity: 0; }
+          100% { transform: rotateY(0deg)   scale(1);    opacity: 1; }
+        }
+        @keyframes landedPop {
+          0%   { transform: scale(0.7); opacity: 0; }
+          60%  { transform: scale(1.08); }
+          100% { transform: scale(1);   opacity: 1; }
+        }
+        @keyframes diceSpin {
+          0%   { transform: rotate(0deg)   scale(1); }
+          25%  { transform: rotate(8deg)   scale(1.05); }
+          75%  { transform: rotate(-8deg)  scale(1.05); }
+          100% { transform: rotate(0deg)   scale(1); }
+        }
+        .dice-rolling { animation: diceSpin 0.15s ease-in-out infinite; }
+        .dice-landed  { animation: landedPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both; }
+      `}</style>
+
+      {/* Ambient glow */}
+      <div style={{
+        position: "absolute", top: "50%", left: "50%",
+        transform: "translate(-50%,-50%)",
+        width: 300, height: 300, borderRadius: "50%",
+        background: `radial-gradient(circle, ${accentColor}12, transparent 65%)`,
+        filter: "blur(40px)", pointerEvents: "none",
+        transition: "background 0.4s ease",
+      }} />
+
+      {phase === "idle" && (
+        <>
+          <div style={{ textAlign: "center", zIndex: 1 }}>
+            <div style={{ fontFamily: "'Fredoka'", fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>
+              Who's next?
+            </div>
+            <div style={{ fontFamily: "'Fredoka'", fontSize: 26, fontWeight: 700, color: C.white, lineHeight: 1.2 }}>
+              Roll the dice and find out
+            </div>
+          </div>
+          <div style={{ fontSize: 64, lineHeight: 1, zIndex: 1 }}>🎲</div>
+          <button onClick={roll} style={{
+            background: C.yellow, color: C.black,
+            fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 14,
+            padding: "14px 36px", border: `3px solid ${C.black}`,
+            borderRadius: 14, boxShadow: `4px 4px 0 ${C.black}`,
+            cursor: "pointer", letterSpacing: 1.2, textTransform: "uppercase",
+            zIndex: 1, display: "flex", alignItems: "center", gap: 10,
+          }}>
+            🎲 Roll the dice
+          </button>
+          <div style={{ fontFamily: "'Oxanium'", fontSize: 11, color: "rgba(255,255,255,0.2)", zIndex: 1 }}>
+            12 options · family, friends, work & more
+          </div>
+        </>
+      )}
+
+      {phase === "rolling" && (
+        <>
+          <div style={{ textAlign: "center", zIndex: 1 }}>
+            <div style={{ fontFamily: "'Fredoka'", fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>
+              Rolling...
+            </div>
+          </div>
+          <div className="dice-rolling" style={{ fontSize: 72, lineHeight: 1, zIndex: 1 }}>
+            {current.emoji}
+          </div>
+          <div style={{
+            fontFamily: "'Fredoka'", fontSize: 22, fontWeight: 700,
+            color: current.color, zIndex: 1, minHeight: 32,
+            transition: "color 0.08s",
+          }}>
+            {current.text}
+          </div>
+        </>
+      )}
+
+      {phase === "landed" && result && (
+        <>
+          <div style={{ textAlign: "center", zIndex: 1 }}>
+            <div style={{ fontFamily: "'Fredoka'", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.35)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>
+              Next up
+            </div>
+          </div>
+
+          <div className="dice-landed" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, zIndex: 1 }}>
+            <div style={{
+              width: 80, height: 80, borderRadius: "50%", fontSize: 40,
+              background: `${result.color}22`, border: `3px solid ${result.color}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: `0 0 24px ${result.color}44`,
+            }}>{result.emoji}</div>
+            <div style={{ fontFamily: "'Fredoka'", fontSize: 28, fontWeight: 700, color: result.color, textAlign: "center" }}>
+              {result.text}
+            </div>
+            <div style={{ fontFamily: "'Oxanium'", fontSize: 13, color: "rgba(255,255,255,0.5)", textAlign: "center" }}>
+              Let's find their celebrity doppelganger!
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 10, zIndex: 1, flexWrap: "wrap", justifyContent: "center" }}>
+            <button onClick={onNew} style={{
+              background: result.color, color: result.color === C.yellow ? C.black : C.white,
+              fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 14,
+              padding: "14px 28px", border: `3px solid ${C.black}`,
+              borderRadius: 14, boxShadow: `4px 4px 0 ${C.black}`,
+              cursor: "pointer", letterSpacing: 1.1, textTransform: "uppercase",
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              📸 Upload Photo
+            </button>
+            <button onClick={reset} style={{
+              background: "transparent", border: "1px solid rgba(255,255,255,0.15)",
+              borderRadius: 14, padding: "14px 20px",
+              fontFamily: "'Oxanium'", fontWeight: 600, fontSize: 13,
+              color: "rgba(255,255,255,0.4)", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 6,
+            }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.35)"; e.currentTarget.style.color = C.white; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
+            >
+              🎲 Roll again
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 // ─── Label taxonomy ──────────────────────────────────────────────────────────
 export const LABELS = [
@@ -320,6 +520,7 @@ export default function DashboardPage({ onNew, onViewResult, onBack }) {
         @media(max-width:600px) { .gen-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
         @media(max-width:380px) { .gen-grid { grid-template-columns: 1fr; } }
         .gen-card:hover .card-play { opacity: 1 !important; }
+        @media(max-width:480px) { .dice-card-span { grid-column: span 2 !important; } }
       `}</style>
 
       {/* ── Header ── */}
@@ -393,6 +594,9 @@ export default function DashboardPage({ onNew, onViewResult, onBack }) {
 
             {/* Grid */}
             <div className="gen-grid" style={{ animation: "slideUp 0.5s ease-out 0.1s both" }}>
+              {/* Dice CTA — always first */}
+              <DiceCard onNew={onNew} />
+
               {gens.map(gen => (
                 <div key={gen.id} className="gen-card">
                   <GenCard
