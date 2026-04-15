@@ -6,6 +6,8 @@ import { useAppStore } from "./store/appStore";
 import { AuthModal } from "./features/auth/AuthModal";
 import { PaywallModal } from "./features/auth/PaywallModal";
 import { isPremium } from "./features/firebase/subscriptionService";
+import { getFlag } from "./config";
+import { celebImg } from "./assets/manifest";
 
 const C = {
   blue: "#2AABE2", yellow: "#FFE500", black: "#0A0A0A", white: "#FFFFFF",
@@ -13,14 +15,14 @@ const C = {
 };
 
 const CELEB_POOL = [
-  { name: "Taylor Swift",       pct: 97, color: C.yellow, img: "/samples/celeb_taylor.jpg"         },
-  { name: "Timothée Chalamet",  pct: 94, color: C.blue,   img: "/samples/celeb_timothee.jpg"        },
-  { name: "Lisa – BLACKPINK",   pct: 96, color: C.pink,   img: "/samples/celeb_lisa.jpg"            },
-  { name: "Henry Cavill",       pct: 91, color: C.cyan,   img: "/samples/celeb_henry.jpg"           },
-  { name: "Michael B. Jordan",  pct: 94, color: C.blue,   img: "/samples/celeb_michael_jordan.jpg"  },
-  { name: "Billie Eilish",      pct: 89, color: C.green,  img: "/samples/celeb_billie.jpg"          },
-  { name: "Selena Gomez",       pct: 92, color: C.pink,   img: "/samples/celeb_selena.jpg"          },
-  { name: "Harry Styles",       pct: 88, color: C.purple, img: "/samples/celeb_harry.jpg"           },
+  { name: "Taylor Swift",       pct: 97, color: C.yellow, img: celebImg("taylor")         },
+  { name: "Timothée Chalamet",  pct: 94, color: C.blue,   img: celebImg("timothee")       },
+  { name: "Lisa – BLACKPINK",   pct: 96, color: C.pink,   img: celebImg("lisa")           },
+  { name: "Henry Cavill",       pct: 91, color: C.cyan,   img: celebImg("henry")          },
+  { name: "Michael B. Jordan",  pct: 94, color: C.blue,   img: celebImg("michael_jordan") },
+  { name: "Billie Eilish",      pct: 89, color: C.green,  img: celebImg("billie")         },
+  { name: "Selena Gomez",       pct: 92, color: C.pink,   img: celebImg("selena")         },
+  { name: "Harry Styles",       pct: 88, color: C.purple, img: celebImg("harry")          },
 ];
 
 const RANK_LABELS = ["1ST MATCH", "2ND MATCH", "3RD MATCH", "4TH MATCH", "5TH MATCH"];
@@ -334,11 +336,8 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
 
   // Active celebrity in the viewer — switched by clicking any card in the row.
   // The list order never changes; only the highlighted card moves.
-  // Unregistered users start on the last match — the only one visible to them.
-  const [activeIdx, setActiveIdx] = useState(() => {
-    if (!user && !preloaded) return freeIdx;
-    return 0;
-  });
+  // Always starts at 0: guests see the blurred #1 match and can click the 5th card to preview it.
+  const [activeIdx, setActiveIdx] = useState(0);
   const celeb = allMatches[activeIdx];
 
   // Viewer-level lock: depends on the currently active match index.

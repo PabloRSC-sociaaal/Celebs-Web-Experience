@@ -1,8 +1,9 @@
-// Results Page — re-exporta con integración de router + store
+// Results Page — wraps the original component with router + store integration
 import { useEffect } from "react";
 import { useNavigate }  from "react-router-dom";
 import { useAppStore }  from "../../store/appStore";
 import ResultsPageOriginal from "../../ResultsPage";
+import { page, EVENTS } from "../../analytics";
 
 export function ResultsPage() {
   const navigate         = useNavigate();
@@ -17,6 +18,7 @@ export function ResultsPage() {
 
   useEffect(() => {
     if (!photo) navigate("/");
+    else page(EVENTS.RESULT_VIEW);
   }, [photo, navigate]);
 
   if (!photo) return null;

@@ -1,19 +1,20 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { LandingPage }   from "../pages/Landing";
 import { AnalyzingPage } from "../pages/Analyzing";
 import { ResultsPage }   from "../pages/Results";
 import { DashboardPage } from "../pages/Dashboard";
 import { SharePage }     from "../pages/Share";
+import { getFlag }       from "../config";
 
 // ─────────────────────────────────────────────────────────
-//  Rutas de la aplicación
-//  Para añadir una página nueva: añade una entrada aquí
-//  y crea su carpeta en pages/
+//  Application routes
+//  Routes guarded by feature flags redirect to / when disabled.
+//  To add a new page: add an entry here and create its folder in pages/
 // ─────────────────────────────────────────────────────────
 export const router = createBrowserRouter([
   { path: "/",              element: <LandingPage /> },
   { path: "/analyzing",     element: <AnalyzingPage /> },
   { path: "/results",       element: <ResultsPage /> },
   { path: "/dashboard",     element: <DashboardPage /> },
-  { path: "/share/:shareId", element: <SharePage /> },
+  { path: "/share/:shareId", element: getFlag("VIRAL_SHARE") ? <SharePage /> : <Navigate to="/" replace /> },
 ]);

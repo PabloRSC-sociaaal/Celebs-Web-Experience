@@ -4,10 +4,56 @@ Historial de cambios por sesión de trabajo. Formato: fecha estimada · commit �
 
 ---
 
-## [Unreleased]
+## [0.7.1] — 2026-04-15
 
-### Mejoras pendientes de commit
-- Mejoras de layout en tarjetas `MatchCard` y `LockedCard` (contenido centrado, bottom strip unificado)
+### docs: @STUB audit — 18 módulos dummy catalogados con prioridades
+
+#### @STUB Tags
+- Añadido `@STUB` tag a **18 módulos** dummy/stub/placeholder con formato estandarizado: Status, Missing, Priority, Effort, Depends.
+- Módulos etiquetados: `app.js` (Firebase config), `functions/index.js` (secrets), `local.js` / `firebase.js` / `supabase.js` (adapters), `sharedGenerations.js`, `mockData.js`, `testPanel.jsx`, 4 analytics providers, `deeplink.js`, `manifest.js`, `FinalCTA.jsx`, `StatsBar.jsx`, `Reviews.jsx`, `HowItWorks.jsx`, `api/src/index.js`, `api/src/routes/generations.js`.
+
+#### PRODUCTION_READINESS.md (nuevo)
+- Documento maestro para el equipo con checklist de producción: 8 P0 (~17h), 4 P1 (~8h), 4 P2 (~8h), 2 P3.
+- Resumen ejecutivo con tabla de prioridades y esfuerzo estimado.
+- 7 decisiones pendientes del equipo que bloquean múltiples items.
+- Instrucciones para buscar `@STUB` en el código.
+
+#### Documentación actualizada
+- `CLAUDE.md`: sección 19 (@STUB System) + sección 20 (Next Steps reorganizado por PRODUCTION_READINESS.md).
+- Monorepo structure actualizado con `PRODUCTION_READINESS.md`.
+
+---
+
+## [0.7.0] — 2026-04-15
+
+### refactor: feature flags, analytics layer, asset manifest, legacy cleanup
+
+#### Feature Flags (`web/src/config/`)
+- **`config.js` → `config/`** directorio: `index.js` (API publica), `featureFlags.js` (registro de flags), `env.js` (env vars centralizadas).
+- 11 feature flags con override por env var (`VITE_FF_<FLAG_ID>`): DEMO_MODE, PAYWALL, MORPH_SLIDER, MORPH_BOOMERANG, VIRAL_SHARE, CAMINO, DICE, ALBUM, PREMIUM_CHECKOUT, SIMILARITY_EXPLORER, NAVBAR_AUTH.
+- `getFlag(id)` resuelve: env override → default. `useFeatureFlag(id)` hook para componentes React.
+- Guards aplicados en: `router/index.jsx` (ruta `/share/:shareId`), `DashboardPage.jsx` (CaminoCTA, DiceCard, AlbumCard, SharedGenCard, share button), `Landing/index.jsx` (SimilarityExplorer).
+
+#### Analytics Layer (`web/src/analytics/`)
+- API publica: `init()`, `track()`, `identify()`, `page()`, `revenue()`, `experiment()`.
+- Catálogo tipado de eventos (`events.js`): 28 eventos en 6 categorías (onboarding, funnel, auth, monetization, viral, engagement).
+- 4 provider stubs con instrucciones de integración: `attribution.js` (MMP), `userAnalytics.js` (Mixpanel/PostHog), `revenue.js` (RevenueCat/Adapty), `experiments.js` (GrowthBook/LaunchDarkly).
+- `deeplink.js`: parseo UTM + sessionStorage persistence, auto-adjunto a cada `track()`.
+- Integración: `initAnalytics()` + `identifyUser()` en `main.jsx`; `track(EVENTS.ANALYSIS_START)` en Analyzing; `page()` en Results y Dashboard.
+- Marcadores `<!-- [ANALYTICS:*] -->` en `web/index.html` para SDK scripts externos.
+
+#### Asset Manifest (`web/src/assets/manifest.js`)
+- Registro centralizado de todos los assets estáticos: celebrities (8), users (5), similarity brackets (10), branding (2).
+- Estado `"placeholder"` vs `"final"` por asset. `getPlaceholders()` para auditoría.
+- Helpers: `celebImg("taylor")`, `userImg("user1")`.
+- Migración: `ResultsPage.jsx`, `mockData.js`, `Gallery.jsx` — ya no hardcodean `/samples/*`.
+
+#### Centralized Env Vars (`config/env.js`)
+- `LS_VARIANT_MONTHLY`, `LS_VARIANT_ANNUAL`, Firebase overrides, `APP_URL`.
+- `PaywallModal.jsx` actualizado para importar de `config/env.js`.
+
+#### Legacy Cleanup
+- Eliminados 7 ficheros obsoletos: `CelebsWebExperience.jsx` (63KB monolito), `db.js`, `faceDetect.js`, `App.jsx`, `App.css`, `react.svg`, `vite.svg`.
 
 ---
 

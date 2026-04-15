@@ -1,11 +1,16 @@
 // ─────────────────────────────────────────────────────────
-//  Celebs API — Express server
+// @STUB — Express API server (entire api/ directory)
+// Status:    DUMMY — server runs but all routes return stub data, no DB connected
+// Missing:   Real database connection, authentication middleware, all route implementations
+// Priority:  P1 — not used by the app yet (frontend uses Firebase Functions directly)
+// Effort:    ~8h+ — define DB schema, implement auth middleware, wire all CRUD routes
+// Depends:   Decision on whether to keep Express API or go full Firebase
+// Note:      The frontend currently does NOT call this server. It uses:
+//            - Firebase Functions for AI comparison + payments
+//            - localStorage adapters for generation persistence
+//            This server is scaffolded for a future standalone backend.
 //
-//  Actualmente en modo "stub": todas las rutas devuelven
-//  datos de ejemplo. El equipo de devs implementará la
-//  lógica real cuando conecten el backend definitivo.
-//
-//  Para arrancar: npm run dev (desde la carpeta api/)
+//  To start: npm run dev (from the api/ folder)
 // ─────────────────────────────────────────────────────────
 
 import "dotenv/config";
@@ -21,7 +26,7 @@ const PORT = process.env.PORT || 3001;
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
 app.use(express.json({ limit: "10mb" }));
 
-// ── Rutas ──
+// ── Routes ──
 app.use("/api/health",      healthRouter);
 app.use("/api/generations", generationsRouter);
 

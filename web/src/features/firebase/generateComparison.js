@@ -1,9 +1,9 @@
 /**
  * generateComparison.js
  *
- * Wrapper para la Cloud Function GenerateComparisonAsync.
- * En DEMO_MODE devuelve datos mock sin tocar Firebase.
- * En producción convierte el blob a base64 y llama a la función real.
+ * Wrapper for the Cloud Function GenerateComparisonAsync.
+ * In DEMO_MODE returns mock data without touching Firebase.
+ * In production converts the blob to base64 and calls the real function.
  */
 
 import { DEMO_MODE } from "../../config";
@@ -21,7 +21,7 @@ const generateComparisonFn = httpsCallable(functions, "GenerateComparisonAsync",
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Convierte un blob URL (o data URL) a base64 puro (sin prefijo data:...).
+ * Converts a blob URL (or data URL) to pure base64 (without the data:... prefix).
  */
 async function toBase64(blobUrl) {
   const res  = await fetch(blobUrl);
@@ -37,7 +37,7 @@ async function toBase64(blobUrl) {
   });
 }
 
-// Paleta de colores para asignar a resultados (por posición)
+// Color palette assigned to results by position
 const RESULT_COLORS = [
   "#FFE500", // 1st — yellow
   "#2AABE2", // 2nd — blue
@@ -50,7 +50,7 @@ const RESULT_COLORS = [
 ];
 
 /**
- * Normaliza un resultado de la API al formato interno { name, pct, img, color }.
+ * Normalizes an API result to the internal format { name, pct, img, color }.
  */
 function normalizeResult(r, index) {
   return {
@@ -58,7 +58,7 @@ function normalizeResult(r, index) {
     pct:          Math.round(r.score),
     img:          r.imageData?.url ?? null,
     color:        RESULT_COLORS[index % RESULT_COLORS.length],
-    // Campos extra para uso futuro
+    // Extra fields for future use
     celebrityId:  r.celebrityId,
     comparisonId: r.comparisonId,
     age:          r.imageData?.age   ?? null,
@@ -73,11 +73,11 @@ function normalizeResult(r, index) {
 /**
  * generateComparison(photoUrl)
  *
- * @param {string} photoUrl  blob: URL de la foto ya recortada por face-detect
- * @returns {Promise<object[]>} Array de celebridades normalizadas, ordenadas por score desc.
+ * @param {string} photoUrl  blob: URL of the face-cropped photo from face-detect
+ * @returns {Promise<object[]>} Array of normalized celebrities, sorted by score desc.
  *
- * En DEMO_MODE: devuelve MOCK_CELEB_RESULTS después de un delay simulado.
- * En producción: llama a GenerateComparisonAsync en Firebase.
+ * In DEMO_MODE: returns MOCK_CELEB_RESULTS after a simulated delay.
+ * In production: calls GenerateComparisonAsync on Firebase.
  */
 export async function generateComparison(photoUrl) {
   // ── DEMO MODE ──────────────────────────────────────────────────────────────
@@ -104,7 +104,7 @@ export async function generateComparison(photoUrl) {
 
   const raw = response.data;
 
-  // La función puede devolver { success: false } o un array
+  // The function may return { success: false } or an array
   if (!Array.isArray(raw) || raw.length === 0) {
     throw new Error(
       raw?.success === false

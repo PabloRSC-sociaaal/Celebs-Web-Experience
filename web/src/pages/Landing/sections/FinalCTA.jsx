@@ -1,3 +1,8 @@
+// @STUB — Email waitlist capture (FinalCTA section)
+// Status:    DUMMY — shows "You're on the list!" but email is NOT persisted anywhere
+// Missing:   Backend integration to save email (Firestore, Mailchimp, Resend, etc.)
+// Priority:  P1 — losing potential leads; wire to any email service
+// Effort:    ~1h — POST to email API or write to Firestore collection
 import { useState } from "react";
 import { colors, fonts } from "../../../design/tokens";
 import { useCtaUpload }  from "../../../hooks/useCtaUpload";

@@ -9,7 +9,8 @@
     "dev:all":    "concurrently \"npm run dev\" \"npm run dev:api\"",
     "build":      "npm run build --prefix web",
     "preview":    "npm run preview --prefix web",
-    "install:all": "npm i --prefix web && npm i --prefix api"
+    "install:all": "npm i --prefix web && npm i --prefix api && npm i --prefix functions",
+    "setup": "npm install && npm run install:all"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

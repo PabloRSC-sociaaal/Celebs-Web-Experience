@@ -1,11 +1,11 @@
 // ─────────────────────────────────────────────────────────
-//  PUNTO DE ENTRADA DEL BACKEND
+//  BACKEND ENTRY POINT
 //
-//  Para cambiar de backend, solo cambia esta línea:
-//    · Desarrollo local:  "./adapters/local.js"
-//    · Supabase:          "./adapters/supabase.js"
-//    · Firebase:          "./adapters/firebase.js"
-//    · API REST propia:   "./adapters/api.js"
+//  To switch backends, change this single import line:
+//    · Local dev:       "./adapters/local.js"
+//    · Supabase:        "./adapters/supabase.js"
+//    · Firebase:        "./adapters/firebase.js"
+//    · Custom REST API: "./adapters/api.js"
 // ─────────────────────────────────────────────────────────
 
 export {

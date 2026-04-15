@@ -1,7 +1,7 @@
 /**
  * subscriptionService.js — Firestore subscription listener + checkout helper
  *
- * En DEMO_MODE: todas las funciones son no-ops o devuelven valores vacíos.
+ * In DEMO_MODE: all functions are no-ops or return empty values.
  */
 
 import { DEMO_MODE } from "../../config";
@@ -19,7 +19,7 @@ const createCheckoutFn = httpsCallable(functions, "createCheckoutUrl");
  */
 export function initSubscriptionListener(uid, callback) {
   if (DEMO_MODE) {
-    callback(null); // sin suscripción en demo
+    callback(null); // no subscription in demo
     return () => {};
   }
   return onSnapshot(

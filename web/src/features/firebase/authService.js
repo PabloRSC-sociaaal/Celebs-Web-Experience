@@ -1,12 +1,12 @@
 /**
  * authService.js — Firebase Auth helpers
  *
- * En DEMO_MODE (config.js): auth completamente en memoria, sin Firebase.
- *   • signInWithGoogle / signInWithEmail / signUpWithEmail → resuelven al instante con MOCK_USER
- *   • signOutUser  → limpia el usuario mock
- *   • initAuthListener → igual que onAuthStateChanged pero con estado local
+ * When DEMO_MODE is true: auth runs entirely in-memory, no Firebase calls.
+ *   • signInWithGoogle / signInWithEmail / signUpWithEmail → resolve instantly with MOCK_USER
+ *   • signOutUser  → clears the mock user
+ *   • initAuthListener → same as onAuthStateChanged but with local state
  *
- * En producción (DEMO_MODE = false): delega todo a Firebase Auth.
+ * When DEMO_MODE is false: delegates everything to Firebase Auth.
  */
 
 import {
@@ -74,12 +74,12 @@ export function signOutUser() {
 
 /**
  * initAuthListener(callback)
- * Llama a callback(user) inmediatamente con el estado actual,
- * y de nuevo cada vez que cambie. Devuelve función de cleanup (unsubscribe).
+ * Calls callback(user) immediately with the current state,
+ * and again whenever it changes. Returns a cleanup (unsubscribe) function.
  */
 export function initAuthListener(callback) {
   if (DEMO_MODE) {
-    callback(_mockUser); // estado inicial = null (no logueado)
+    callback(_mockUser); // initial state = null (not logged in)
     _mockListeners.add(callback);
     return () => _mockListeners.delete(callback);
   }

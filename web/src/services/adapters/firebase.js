@@ -1,11 +1,16 @@
 // ─────────────────────────────────────────────────────────
-//  Adaptador FIREBASE — stub listo para implementar.
+// @STUB — Firebase/Firestore persistence adapter
+// Status:    DUMMY — throws on every call, not functional
+// Missing:   Firestore CRUD for per-user generation storage
+// Priority:  P0 — required for multi-device and real user data
+// Effort:    ~4h — reuse firebase/app.js, create collection schema, implement exports
+// Depends:   Firebase project operational (already set up for auth/functions)
 //
-//  El equipo de devs solo necesita:
-//    1. npm install firebase
-//    2. Añadir las variables VITE_FIREBASE_* a .env
-//    3. Implementar las funciones de abajo
-//    4. Cambiar services/index.js para exportar desde aquí
+//  Steps to implement:
+//    1. npm install firebase (already installed)
+//    2. Add VITE_FIREBASE_* variables to .env
+//    3. Implement the functions below
+//    4. Change services/index.js to export from this file
 // ─────────────────────────────────────────────────────────
 
 // import { initializeApp } from "firebase/app";

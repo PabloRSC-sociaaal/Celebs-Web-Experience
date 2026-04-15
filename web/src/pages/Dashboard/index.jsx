@@ -1,7 +1,9 @@
-// Dashboard Page — re-exporta con integración de router + store
+// Dashboard Page — wraps the original component with router + store integration
+import { useEffect }     from "react";
 import { useNavigate }    from "react-router-dom";
 import { useAppStore }    from "../../store/appStore";
 import DashboardPageOriginal from "../../DashboardPage";
+import { page, EVENTS }  from "../../analytics";
 
 export function DashboardPage() {
   const navigate          = useNavigate();
@@ -9,6 +11,8 @@ export function DashboardPage() {
   const setPreloaded      = useAppStore(s => s.setPreloadedResult);
   const setReturnContext  = useAppStore(s => s.setReturnContext);
   const reset             = useAppStore(s => s.reset);
+
+  useEffect(() => { page(EVENTS.DASHBOARD_VIEW); }, []);
 
   const handleViewResult = (gen) => {
     setPhoto(gen.preview);

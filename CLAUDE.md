@@ -1,7 +1,7 @@
 # CELEBS — Project Context for AI Agents
 
 > **Read this first.** Single source of truth for any AI agent working on this codebase.
-> Last updated: commit `65b1318` — morph slider, paywall tiers, viral share loop, responsive polish.
+> Last updated: v0.7.0 — feature flags, analytics layer, asset manifest, legacy cleanup.
 
 ---
 
@@ -18,14 +18,16 @@
 ```
 celebs-preview/
 ├── web/            ← React frontend (Vite) — the main app
-├── api/            ← Express backend stub (ready for real impl, not wired)
-├── functions/      ← Firebase Cloud Functions (payments + webhooks)
+├── api/            ← Express backend stub (@STUB — not wired to app)
+├── functions/      ← Firebase Cloud Functions (@STUB — secrets not configured)
 ├── package.json    ← root scripts (concurrently)
 ├── firebase.json   ← Functions + Firestore config
 ├── firestore.rules ← Subscription read rules
-├── CLAUDE.md       ← this file
+├── CLAUDE.md       ← this file (project context for AI agents)
 ├── CHANGELOG.md    ← history of features by session
-└── LEMON_SQUEEZY_SETUP.md ← step-by-step payment setup guide
+├── PRODUCTION_READINESS.md ← ★ @STUB audit: 18 modules cataloged with priorities
+├── LEMON_SQUEEZY_SETUP.md  ← step-by-step payment setup guide
+└── OPENCLAW_RESET_CHECKLIST.md ← deployment checklist
 ```
 
 ### Root scripts
@@ -58,15 +60,30 @@ npm run install:all  # install deps in both web/ and api/
 
 ```
 web/src/
-├── main.jsx                         ← Entry: StrictMode + RouterProvider + auth listener + subscription
-├── config.js                        ← ★ DEMO_MODE flag (true=mocks, false=Firebase real)
+├── main.jsx                         ← Entry: StrictMode + RouterProvider + auth listener + analytics init
+├── config/
+│   ├── index.js                     ← ★ getFlag(), DEMO_MODE, env re-exports (replaces old config.js)
+│   ├── featureFlags.js              ← ★ FLAG_DEFINITIONS + resolveFlag (env override via VITE_FF_*)
+│   └── env.js                       ← Centralized import.meta.env.VITE_* reads
+├── analytics/
+│   ├── index.js                     ← ★ Public API: init(), track(), identify(), page(), revenue()
+│   ├── events.js                    ← Typed event catalog (EVENTS.UPLOAD_START, etc.)
+│   ├── deeplink.js                  ← UTM parsing + sessionStorage persistence
+│   └── providers/
+│       ├── index.js                 ← Provider registry (initializes all active providers)
+│       ├── attribution.js           ← Stub MMP (AppsFlyer / Adjust / Branch)
+│       ├── userAnalytics.js         ← Stub analytics (Mixpanel / PostHog / Amplitude)
+│       ├── revenue.js               ← Stub revenue (RevenueCat / Adapty / Lemon Squeezy)
+│       └── experiments.js           ← Stub A/B testing (GrowthBook / LaunchDarkly)
 ├── router/
-│   └── index.jsx                    ← createBrowserRouter — 5 routes
+│   └── index.jsx                    ← createBrowserRouter — 5 routes (flag-guarded)
 ├── store/
 │   └── appStore.js                  ← Zustand store (full global state)
 ├── design/
 │   ├── tokens.js                    ← ★ colors, fonts, radii, shadows
 │   └── globalStyles.js              ← @keyframes + global CSS string + navbar responsive
+├── assets/
+│   └── manifest.js                  ← ★ Central registry of all static assets (placeholder vs final)
 ├── services/
 │   ├── index.js                     ← ★ Active backend switch (1 line to change)
 │   ├── sharedGenerations.js         ← Viral share loop CRUD (localStorage, demo)
@@ -86,9 +103,10 @@ web/src/
 │   │   └── testPanel.jsx            ← 🧪 Dev-only debug panel (remove before prod)
 │   └── auth/
 │       ├── AuthModal.jsx            ← Sign in/up modal (Google + email/password)
-│       └── PaywallModal.jsx         ← Premium paywall modal (monthly/annual plans)
+│       └── PaywallModal.jsx         ← Premium paywall modal (uses env.js for variant IDs)
 ├── hooks/
 │   ├── useCtaUpload.js              ← Shared upload trigger hook (any CTA → file picker)
+│   ├── useFeatureFlag.js            ← React hook for feature flags: useFeatureFlag("CAMINO")
 │   └── useInView.js                 ← IntersectionObserver hook
 ├── components/                      ← Reusable UI components
 │   ├── Button/index.jsx
@@ -103,39 +121,33 @@ web/src/
 │   ├── ScanningVisual/index.jsx
 │   └── Stars/index.jsx
 ├── demo/
-│   └── mockData.js                  ← Mock user + celebrity results (DEMO_MODE fallback)
+│   └── mockData.js                  ← Mock user + celebrity results (reads from assets/manifest.js)
 ├── pages/
 │   ├── Landing/
-│   │   ├── index.jsx                ← Navbar + auth + all sections + footer
+│   │   ├── index.jsx                ← Navbar + auth + all sections (flag-guarded) + footer
 │   │   └── sections/
 │   │       ├── Hero.jsx
 │   │       ├── StatsBar.jsx
 │   │       ├── HowItWorks.jsx
 │   │       ├── Exclusivity.jsx      ← Scroll-pinned sticky animation section
-│   │       ├── SimilarityExplorer.jsx ← Interactive % slider with comparison examples
-│   │       ├── Gallery.jsx
+│   │       ├── SimilarityExplorer.jsx ← Interactive % slider (guarded by SIMILARITY_EXPLORER flag)
+│   │       ├── Gallery.jsx          ← Uses assets/manifest.js for image paths
 │   │       ├── Reviews.jsx          ← Includes viral CTA review card
 │   │       ├── UseCases.jsx
 │   │       └── FinalCTA.jsx         ← Upload CTA + Create Account + email capture
 │   ├── Analyzing/
-│   │   └── index.jsx                ← Thin wrapper: starts API call + gates navigation
+│   │   └── index.jsx                ← Thin wrapper: starts API call + tracks analytics events
 │   ├── Results/
-│   │   └── index.jsx                ← Thin wrapper: passes apiResult + returnContext
+│   │   └── index.jsx                ← Thin wrapper: passes apiResult + tracks page view
 │   ├── Dashboard/
-│   │   └── index.jsx                ← Thin wrapper: router+store → DashboardPage
+│   │   └── index.jsx                ← Thin wrapper: router+store + tracks dashboard_view
 │   └── Share/
 │       └── index.jsx                ← Recipient page for viral share links (selfie-only)
 │
 │   ── Core page files (wrapped by pages/) ──
 ├── AnalyzingPage.jsx                ← Core animated scan UI (8s, landmark dots)
 ├── ResultsPage.jsx                  ← Core results UI (paywall, morph, match cards, share)
-└── DashboardPage.jsx                ← Core dashboard UI (Camino, Dice, Album, GenCards, SharedGenCard)
-│
-│   ── Legacy (not imported by main.jsx, kept for reference) ──
-├── CelebsWebExperience.jsx          ← LEGACY monolith (not used)
-├── db.js                            ← LEGACY (superseded by services/adapters/local.js)
-├── faceDetect.js                    ← LEGACY (superseded by features/face/detect.js)
-├── App.jsx + App.css                ← Vite scaffold (not used)
+├── DashboardPage.jsx                ← Core dashboard UI (flag-guarded game cards, GenCards, SharedGenCard)
 └── index.css                        ← Minimal global reset
 ```
 
@@ -208,19 +220,43 @@ export function ResultsPage() {
 
 ---
 
-## 6. DEMO_MODE
+## 6. Feature Flags & DEMO_MODE
 
-**File:** `web/src/config.js`
+**Config directory:** `web/src/config/`
 
 ```js
-export const DEMO_MODE = true; // set to false for production
+import { getFlag, DEMO_MODE } from "./config";
+
+getFlag("CAMINO")     // → true/false (checks VITE_FF_CAMINO env override, then default)
+getFlag("DEMO_MODE")  // → same as DEMO_MODE export
 ```
 
+### Feature flags registry (`config/featureFlags.js`)
+Each flag: `{ enabled: boolean, label: string }`. Override at build time with `VITE_FF_<FLAG_ID>=false`.
+
+| Flag | Default | Controls |
+|---|---|---|
+| `DEMO_MODE` | `true` | Mock auth + API (bypass Firebase) |
+| `PAYWALL` | `true` | Two-tier paywall on results |
+| `MORPH_SLIDER` | `true` | Face morphing in results viewer |
+| `MORPH_BOOMERANG` | `true` | Auto-morph animation on dashboard |
+| `VIRAL_SHARE` | `true` | Share generation link flow + `/share/:shareId` route |
+| `CAMINO` | `true` | Camino a la Fama game mode |
+| `DICE` | `true` | Dice roll game mode |
+| `ALBUM` | `false` | Album feature (coming soon) |
+| `PREMIUM_CHECKOUT` | `true` | Lemon Squeezy checkout flow |
+| `SIMILARITY_EXPLORER` | `true` | Interactive % slider on landing |
+| `NAVBAR_AUTH` | `true` | Auth buttons in navbar |
+
+### DEMO_MODE behavior
 | Module | DEMO_MODE = true | DEMO_MODE = false |
 |---|---|---|
 | `authService.js` | In-memory mock user | Firebase Auth (Google + email) |
 | `generateComparison.js` | mockData delay + CELEB_POOL | Firebase callable `GenerateComparisonAsync` |
 | `subscriptionService.js` | No-op (subscription stays null) | Firestore `onSnapshot` + Lemon Squeezy |
+
+### Centralized env vars (`config/env.js`)
+All `import.meta.env.VITE_*` reads are centralized here. No other file reads env vars directly.
 
 ---
 
@@ -572,12 +608,76 @@ Celebrity images from CDN (`cdn.sociaaal.com`) trigger canvas tainting if loaded
 ```
 `key={celeb.name}` forces React to fully remount MorphSlider when the active celebrity changes, resetting all internal canvas/worker state cleanly.
 
-### 14m. DEMO_MODE in config.js
-When `DEMO_MODE = true`: auth uses in-memory mock, generateComparison returns mockData with delay, subscription stays null (no paywall blocks). Flip to `false` for any real testing or production.
+### 14m. DEMO_MODE (now a feature flag)
+When `DEMO_MODE = true` (or `VITE_FF_DEMO_MODE=true`): auth uses in-memory mock, generateComparison returns mockData with delay, subscription stays null. Flip to `false` for any real testing or production.
+
+### 14n. Feature flags guard components, not routes only
+Flag checks use `getFlag()` at render time. Game cards in Dashboard are wrapped with `{getFlag("CAMINO") && <CaminoCTA />}`. The `/share/:shareId` route renders `<Navigate to="/" />` when `VIRAL_SHARE` is disabled.
+
+### 14o. Asset manifest single source of truth
+All `/samples/*` paths go through `assets/manifest.js`. Use `celebImg("taylor")` / `userImg("user1")` helpers. Never hardcode image paths.
 
 ---
 
-## 15. Code Conventions
+## 15. Analytics Layer
+
+**Directory:** `web/src/analytics/`
+
+### Public API (`analytics/index.js`)
+```js
+import { init, track, identify, page, revenue, experiment } from "./analytics";
+import { EVENTS } from "./analytics/events";
+
+init();                              // call once in main.jsx
+identify(user.uid, { email });       // after login
+track(EVENTS.UPLOAD_START, { src }); // anywhere in the app
+page(EVENTS.RESULT_VIEW);           // page wrappers
+revenue(4.99, "USD", { plan });     // after subscription
+experiment("new_paywall", "control"); // A/B test variant
+```
+
+### Event catalog (`analytics/events.js`)
+All event names defined as constants. Categories: Onboarding, Core funnel, Auth, Monetization, Viral, Engagement.
+
+### Provider stubs (`analytics/providers/`)
+Four providers, all stubs (console.debug in dev, no-op in prod). Each has integration instructions in comments:
+- **attribution.js** — MMP (AppsFlyer / Adjust / Branch)
+- **userAnalytics.js** — Product analytics (Mixpanel / PostHog / Amplitude)
+- **revenue.js** — Revenue tracking (RevenueCat / Adapty)
+- **experiments.js** — A/B testing (GrowthBook / LaunchDarkly / Firebase A/B)
+
+### Deep links (`analytics/deeplink.js`)
+Parses UTM parameters from URL on load, persists to `sessionStorage`, auto-attaches to every `track()` call.
+
+### HTML markers (`web/index.html`)
+```html
+<!-- [ANALYTICS:MMP] --> <!-- [ANALYTICS:USER] --> <!-- [ANALYTICS:AB] --> <!-- [ANALYTICS:REVENUE] -->
+```
+Paste third-party SDK scripts at these markers.
+
+---
+
+## 16. Asset Management
+
+**File:** `web/src/assets/manifest.js`
+
+Central registry of all static assets. Every image path comes from here — never hardcode `/samples/...`.
+
+```js
+import { celebImg, userImg, getPlaceholders } from "./assets/manifest";
+
+celebImg("taylor")     // → "/samples/celeb_taylor.jpg"
+userImg("user1")       // → "/samples/user1.jpg"
+getPlaceholders()      // → [{ category, key, path, status, note }, ...]
+```
+
+Each entry has: `{ path, status: "placeholder"|"final", note }`.
+
+To update an asset: change the `path` and set `status` to `"final"`.
+
+---
+
+## 17. Code Conventions
 
 ```js
 // 1. Import tokens, never hardcode
@@ -598,13 +698,24 @@ navigate("/results");   // ✅ (never window.location except checkout new tab)
 import { saveGeneration } from "../../services";               // ✅
 import { saveGeneration } from "../../services/adapters/local"; // ❌
 
-// 6. Section headers in files
+// 6. Assets — always use manifest helpers
+import { celebImg } from "../../assets/manifest";              // ✅
+const img = "/samples/celeb_taylor.jpg";                       // ❌
+
+// 7. Feature flags — use getFlag() or useFeatureFlag()
+import { getFlag } from "../../config";                        // ✅
+const enabled = someHardcodedBool;                             // ❌
+
+// 8. Analytics — use track() with EVENTS constants
+import { track, EVENTS } from "../../analytics";               // ✅
+
+// 9. Section headers in files
 // ─── Section Name ─────────────────────────────────────────────────────────────
 ```
 
 ---
 
-## 16. Current Status
+## 18. Current Status
 
 ### ✅ Implemented and working
 - Face detection (face-api.js TinyFaceDetector + native + heuristic fallbacks)
@@ -625,6 +736,10 @@ import { saveGeneration } from "../../services/adapters/local"; // ❌
 - Dashboard: GenCards, MorphBoomerang, DiceCard, AlbumCard, Camino
 - Responsive design: mobile-first, 100dvh hero, match card media queries
 - Navbar mobile: Sign Up / My Photos visible in top bar
+- **Feature flags system:** 11 flags, env override, `getFlag()` API, guards in router/dashboard/landing/results
+- **Analytics layer:** public API + event catalog + 4 provider stubs (MMP, analytics, revenue, A/B) + UTM/deeplink tracking
+- **Asset manifest:** centralized registry, `celebImg()`/`userImg()` helpers, `getPlaceholders()` auditor
+- **Legacy cleanup:** removed CelebsWebExperience.jsx, db.js, faceDetect.js, App.jsx, App.css, scaffold SVGs
 
 ### 🎭 Mock / stub / placeholder
 - `CELEB_POOL` (8 hardcoded celebrities) — used only if API throws
@@ -633,38 +748,62 @@ import { saveGeneration } from "../../services/adapters/local"; // ❌
 - `api/` Express server — stub, not wired to the app
 - `services/adapters/firebase.js` + `supabase.js` — ready interfaces, empty impl
 - `sharedGenerations.js` — localStorage only; TODO: replace with Firestore
+- Analytics providers — all stubs (console.debug in dev); replace with real SDKs
+- All image assets in `assets/manifest.js` — status: `"placeholder"`
 
 ### 🔲 Not yet built
 - Firestore persistence for generations (per-user cloud storage)
 - Multi-device shared generations (currently same browser only)
 - Dynamic OG share images
-- Analytics / event tracking
+- Real analytics SDK integration (providers are stubs)
 - Face embeddings (CTO plans to add to Cloud Function)
 - Real domain + `<meta og:image>`
+- Firebase Remote Config integration for runtime flag overrides
 
 ---
 
-## 17. Next Steps (Priority Order)
+## 19. @STUB System — Production Readiness Audit
 
-### P0 — Before real users
-1. Set `DEMO_MODE = false` in `web/src/config.js`
-2. Fill `functions/.env` secrets (Lemon Squeezy API key, webhook secret, store ID)
-3. Fill `web/.env` Lemon Squeezy variant IDs
-4. Deploy Cloud Functions: `firebase deploy --only functions`
-5. Remove `features/firebase/testPanel.jsx` import from DashboardPage
-6. Replace `sharedGenerations.js` localStorage with Firestore collection
+Every module that is dummy, stub, or placeholder is tagged with `@STUB` in the source code.
 
-### P1 — Core product
-7. Connect `services/adapters/firebase.js` so generations are stored per-user in Firestore
-8. Email waitlist — wire FinalCTA to Firestore or Mailchimp
-9. Real domain + OG meta tags
+```bash
+grep -rn "@STUB" web/src/ api/src/ functions/ --include="*.js" --include="*.jsx"
+```
 
-### P2 — UX polish
-10. Delete legacy files: `CelebsWebExperience.jsx`, `db.js`, `faceDetect.js`, `App.jsx`, `App.css`
-11. Dashboard sort/filter (by date, label, celeb name)
-12. Auth error messages — map Firebase error codes to friendly strings
+Full catalog with priorities, effort estimates, and dependencies: **`PRODUCTION_READINESS.md`**
+
+Summary: **18 modules tagged** — 8 P0, 4 P1, 4 P2, 2 P3. Estimated ~25h for launch readiness (P0+P1).
+
+---
+
+## 20. Next Steps (Priority Order)
+
+> See `PRODUCTION_READINESS.md` for detailed checklists per module.
+
+### P0 — Before real users (8 items, ~17h)
+1. Move Firebase config to env vars (`app.js` — hardcoded API keys)
+2. Configure + deploy Cloud Functions (Lemon Squeezy secrets)
+3. Implement `services/adapters/firebase.js` for per-user generation persistence
+4. Migrate `sharedGenerations.js` to Firestore + Firebase Storage
+5. Integrate user analytics SDK (PostHog or Mixpanel)
+6. Integrate revenue tracking (RevenueCat or Lemon Squeezy dashboard)
+7. Remove `testPanel.jsx` from DashboardPage
+8. Set `DEMO_MODE = false`
+
+### P1 — Core product (4 items, ~8h)
+9. Integrate MMP provider for campaign attribution
+10. Wire email waitlist (FinalCTA → email service)
+11. Replace placeholder images (28 entries in `assets/manifest.js`)
+12. Real domain + OG meta tags
+
+### P2 — UX polish (4 items, ~8h)
+13. Set up A/B testing provider (GrowthBook recommended)
+14. Replace hardcoded stats with real metrics
+15. Real user testimonials (Reviews section)
+16. Validate marketing claims (HowItWorks copy)
 
 ### P3 — Growth
-13. Dynamic share image (user face + celeb face + % — Satori or Cloudinary)
-14. Analytics (Plausible or PostHog: upload, detect, reveal, share events)
-15. Face embeddings (update `generateComparison.js` when CTO adds support)
+17. Dynamic share image (Satori / Cloudinary)
+18. Face embeddings (when CTO adds to Cloud Function)
+19. Firebase Remote Config for runtime feature flag toggling
+20. Dashboard sort/filter by date, label, celeb name

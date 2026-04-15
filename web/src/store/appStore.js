@@ -1,52 +1,52 @@
 // ─────────────────────────────────────────────────────────
-//  Store global con Zustand
-//  Estado compartido entre todas las páginas.
+//  Global store (Zustand)
+//  Shared state across all pages.
 //
-//  Para añadir un nuevo estado: añade aquí y consume con useAppStore()
+//  To add new state: add it here and consume via useAppStore()
 // ─────────────────────────────────────────────────────────
 
 import { create } from "zustand";
 
 export const useAppStore = create((set) => ({
-  // Foto subida por el usuario (blob URL)
+  // User-uploaded photo (blob URL)
   uploadedPhoto: null,
   setUploadedPhoto: (url) => set({ uploadedPhoto: url }),
 
-  // Resultado precargado (para replay desde dashboard)
+  // Preloaded result (for replay from dashboard)
   preloadedResult: null,
   setPreloadedResult: (result) => set({ preloadedResult: result }),
 
-  // Si el spotlight (overlay oscuro) está activo
+  // Whether the spotlight (dark overlay) is active
   spotlight: false,
   setSpotlight: (val) => set({ spotlight: val }),
 
-  // Archivo pendiente de procesar (enviado desde cualquier CTA)
+  // Pending file to process (sent from any CTA)
   pendingFile: null,
   setPendingFile: (file) => set({ pendingFile: file }),
 
-  // Geometría facial normalizada (centro, bounding box, ratio)
+  // Normalized face geometry (center, bounding box, ratio)
   faceGeometry: null,
   setFaceGeometry: (geo) => set({ faceGeometry: geo }),
 
-  // Si el usuario tiene generaciones previas (para mostrar botón Dashboard)
+  // Whether the user has previous generations (shows Dashboard button)
   hasDashboard: false,
   setHasDashboard: (val) => set({ hasDashboard: val }),
 
-  // Contexto de retorno — de dónde vino el usuario al iniciar un scan
+  // Return context — where the user came from when starting a scan
   // Shape: { type: "camino"|"dice"|"free", returnTo: "camino"|"dashboard",
   //          step?: number, hint?: { emoji, text, color } }
   returnContext: null,
   setReturnContext: (ctx) => set({ returnContext: ctx }),
 
-  // Sub-página activa del dashboard (persiste al navegar a results y volver)
+  // Active dashboard sub-page (persists when navigating to results and back)
   dashSubPage: "main",   // "main" | "camino"
   setDashSubPage: (v) => set({ dashSubPage: v }),
 
-  // Índice del paso que acaba de completarse (para trigger animation en Camino)
+  // Index of the just-completed step (triggers animation in Camino)
   justCompletedStep: null,   // number | null
   setJustCompletedStep: (n) => set({ justCompletedStep: n }),
 
-  // Resultado real de la API (array normalizado de celebridades)
+  // Real API result (normalized celebrity array)
   apiResult: null,
   setApiResult: (result) => set({ apiResult: result }),
 
@@ -58,7 +58,7 @@ export const useAppStore = create((set) => ({
   subscription: null,
   setSubscription: (sub) => set({ subscription: sub }),
 
-  // Reset completo — limpia el scan pero NO cierra sesión
+  // Full reset — clears scan state but does NOT log out
   reset: () => set({
     uploadedPhoto: null,
     preloadedResult: null,
@@ -66,6 +66,6 @@ export const useAppStore = create((set) => ({
     returnContext: null,
     faceGeometry: null,
     apiResult: null,
-    // user se mantiene intencionalmente — el logout es explícito
+    // user is kept intentionally — logout is explicit via signOutUser()
   }),
 }));

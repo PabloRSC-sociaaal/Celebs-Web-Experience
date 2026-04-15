@@ -9,6 +9,7 @@ import { Button }              from "../../components/Button";
 import { useCtaUpload }        from "../../hooks/useCtaUpload";
 import { AuthModal }           from "../../features/auth/AuthModal";
 import { signOutUser }         from "../../features/firebase/authService";
+import { getFlag }             from "../../config";
 
 import { HeroSection }   from "./sections/Hero";
 import { StatsBar }      from "./sections/StatsBar";
@@ -297,12 +298,12 @@ export function LandingPage() {
         </div>
       </nav>
 
-      {/* Secciones */}
+      {/* Sections */}
       <HeroSection />
       <StatsBar />
       <HowItWorks />
       <Exclusivity />
-      <SimilarityExplorer />
+      {getFlag("SIMILARITY_EXPLORER") && <SimilarityExplorer />}
       <Gallery />
       <Reviews />
       <UseCases />

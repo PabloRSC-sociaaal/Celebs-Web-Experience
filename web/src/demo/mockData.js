@@ -1,17 +1,22 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  DEMO MOCK DATA
+// @STUB — Mock celebrity results + mock user (DEMO_MODE only)
+// Status:    DUMMY — hardcoded data, no real AI/API behind it
+// Missing:   Nothing — this file is intentionally mock. Gets bypassed when DEMO_MODE=false.
+// Priority:  P3 — keep for development/testing; irrelevant in production
+// Note:      When DEMO_MODE=false, generateComparison.js calls the real Cloud Function.
+//            This file only exists as a fallback during development.
 //
-//  Datos realistas que simulan la respuesta normalizada de GenerateComparisonAsync.
-//  Formato idéntico al que devuelve generateComparison.js en producción.
-//
-//  Para cambiar qué celebridades aparecen en demo, edita este array.
+//  Realistic data simulating the normalized response from GenerateComparisonAsync.
+//  Format identical to what generateComparison.js returns in production.
+//  Image paths are centralized in assets/manifest.js
 // ─────────────────────────────────────────────────────────────────────────────
+import { celebImg } from "../assets/manifest";
 
 export const MOCK_CELEB_RESULTS = [
   {
     name:         "Taylor Swift",
     pct:          94,
-    img:          "/samples/celeb_taylor.jpg",
+    img:          celebImg("taylor"),
     color:        "#FFE500",
     celebrityId:  "demo-001",
     comparisonId: "demo-comparison-001",
@@ -23,7 +28,7 @@ export const MOCK_CELEB_RESULTS = [
   {
     name:         "Selena Gomez",
     pct:          87,
-    img:          "/samples/celeb_selena.jpg",
+    img:          celebImg("selena"),
     color:        "#2AABE2",
     celebrityId:  "demo-002",
     comparisonId: "demo-comparison-001",
@@ -35,7 +40,7 @@ export const MOCK_CELEB_RESULTS = [
   {
     name:         "Billie Eilish",
     pct:          81,
-    img:          "/samples/celeb_billie.jpg",
+    img:          celebImg("billie"),
     color:        "#FF3CAC",
     celebrityId:  "demo-003",
     comparisonId: "demo-comparison-001",
@@ -47,7 +52,7 @@ export const MOCK_CELEB_RESULTS = [
   {
     name:         "Lisa – BLACKPINK",
     pct:          76,
-    img:          "/samples/celeb_lisa.jpg",
+    img:          celebImg("lisa"),
     color:        "#00E5FF",
     celebrityId:  "demo-004",
     comparisonId: "demo-comparison-001",
@@ -59,7 +64,7 @@ export const MOCK_CELEB_RESULTS = [
   {
     name:         "Harry Styles",
     pct:          71,
-    img:          "/samples/celeb_harry.jpg",
+    img:          celebImg("harry"),
     color:        "#22c55e",
     celebrityId:  "demo-005",
     comparisonId: "demo-comparison-001",
@@ -71,7 +76,7 @@ export const MOCK_CELEB_RESULTS = [
   {
     name:         "Timothée Chalamet",
     pct:          68,
-    img:          "/samples/celeb_timothee.jpg",
+    img:          celebImg("timothee"),
     color:        "#8B5CF6",
     celebrityId:  "demo-006",
     comparisonId: "demo-comparison-001",
@@ -83,7 +88,7 @@ export const MOCK_CELEB_RESULTS = [
   {
     name:         "Henry Cavill",
     pct:          63,
-    img:          "/samples/celeb_henry.jpg",
+    img:          celebImg("henry"),
     color:        "#FF6B6B",
     celebrityId:  "demo-007",
     comparisonId: "demo-comparison-001",
@@ -95,7 +100,7 @@ export const MOCK_CELEB_RESULTS = [
   {
     name:         "Michael B. Jordan",
     pct:          58,
-    img:          "/samples/celeb_michael_jordan.jpg",
+    img:          celebImg("michael_jordan"),
     color:        "#FFA500",
     celebrityId:  "demo-008",
     comparisonId: "demo-comparison-001",

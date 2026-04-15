@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import { createCheckout, isPremium } from "../firebase/subscriptionService";
 import { useAppStore } from "../../store/appStore";
-
-const VARIANT_MONTHLY = import.meta.env.VITE_LS_VARIANT_MONTHLY || "";
-const VARIANT_ANNUAL  = import.meta.env.VITE_LS_VARIANT_ANNUAL  || "";
+import { LS_VARIANT_MONTHLY, LS_VARIANT_ANNUAL } from "../../config";
 
 const PLANS = [
-  { id: "monthly", variantId: VARIANT_MONTHLY, label: "Monthly",  price: "$4.99", period: "/mo",  badge: null },
-  { id: "annual",  variantId: VARIANT_ANNUAL,  label: "Annual",   price: "$29.99", period: "/yr", badge: "SAVE 50%" },
+  { id: "monthly", variantId: LS_VARIANT_MONTHLY, label: "Monthly",  price: "$4.99", period: "/mo",  badge: null },
+  { id: "annual",  variantId: LS_VARIANT_ANNUAL,  label: "Annual",   price: "$29.99", period: "/yr", badge: "SAVE 50%" },
 ];
 
 export function PaywallModal({ isOpen, onClose }) {

@@ -1,4 +1,10 @@
 /**
+ * @STUB — Firebase app config (HARDCODED credentials — needs env var migration)
+ * Status:    FUNCTIONAL but INSECURE — API keys hardcoded in source
+ * Missing:   Move all config values to env vars (VITE_FIREBASE_*) via config/env.js
+ * Priority:  P0 — hardcoded keys must not ship to production
+ * Effort:    30min — read from config/env.js, add to .env, update .env.example
+ *
  * app.js — Shared Firebase app instance "celebs"
  * Both auth and functions import from here.
  */

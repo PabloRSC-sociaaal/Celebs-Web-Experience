@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────
-//  Design Tokens — única fuente de verdad visual del proyecto
-//  Para cambiar toda la paleta: edita solo este archivo.
+//  Design Tokens — single source of truth for the project's visual language
+//  To change the entire palette: edit only this file.
 // ─────────────────────────────────────────────────────────
 
 export const colors = {

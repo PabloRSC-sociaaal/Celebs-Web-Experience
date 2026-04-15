@@ -1,3 +1,8 @@
+// @STUB — Reviews section with hardcoded fake testimonials
+// Status:    DUMMY — reviews are fabricated, not from real users
+// Missing:   Real user testimonials or integration with review platform (Trustpilot, etc.)
+// Priority:  P2 — replace with real social proof before marketing launch
+// Effort:    ~2h — design review submission flow or pull from external API
 import { colors, fonts } from "../../../design/tokens";
 import { Stars }         from "../../../components/Stars";
 import { useCtaUpload }  from "../../../hooks/useCtaUpload";

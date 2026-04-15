@@ -1,5 +1,10 @@
 // ─────────────────────────────────────────────────────────
-//  Shared Generations — Viral Share Loop
+// @STUB — Shared Generations / Viral Share Loop (ACTIVE — demo only)
+// Status:    FUNCTIONAL but TEMPORARY — localStorage, same browser only
+// Missing:   Firestore + Firebase Storage for cross-device shared links
+// Priority:  P0 — viral loop is broken without cross-device support
+// Effort:    ~6h — migrate all functions to Firestore CRUD + Storage uploads
+// Depends:   Firebase project operational + Storage bucket configured
 //
 //  DEMO: localStorage (same browser). In production, replace
 //  with Firestore reads/writes so the link works cross-device:

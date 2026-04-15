@@ -1,3 +1,7 @@
+// @STUB — HowItWorks section — marketing copy with unverified claims
+// Status:    DUMMY — "4,000 facial points" and "50,000+ celebrities" are marketing copy, not validated
+// Missing:   Verify claims against actual AI model capabilities; update copy accordingly
+// Priority:  P2 — legal/marketing review before public launch
 import { colors, fonts } from "../../../design/tokens";
 import { Button }         from "../../../components/Button";
 import { ScanningVisual } from "../../../components/ScanningVisual";

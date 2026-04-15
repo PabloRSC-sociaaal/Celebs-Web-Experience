@@ -6,6 +6,7 @@ import { FirebaseTestPanel } from "./features/firebase/testPanel";
 import { MorphBoomerang } from "./components/MorphBoomerang";
 import { signOutUser } from "./features/firebase/authService";
 import { AuthModal } from "./features/auth/AuthModal";
+import { getFlag } from "./config";
 import {
   createSharedRequest,
   getAllSharedRequests,
@@ -1179,7 +1180,7 @@ function IntranetUploadModal({ ctx, onClose, onReady, onShareRequest }) {
             </div>
 
             {/* "Ask someone else" — only for Camino/Dice (not free uploads) */}
-            {onShareRequest && ctx?.type !== "free" && ctx?.hint && (
+            {getFlag("VIRAL_SHARE") && onShareRequest && ctx?.type !== "free" && ctx?.hint && (
               <button onClick={() => onShareRequest(ctx)} style={{
                 width:"100%", padding:"12px",
                 background:"transparent",
@@ -2360,16 +2361,16 @@ export default function DashboardPage({ onViewResult, onBack, onStartScan }) {
             {/* Grid — games first, then generations */}
             <div className="gen-grid" style={{ animation: "slideUp 0.5s ease-out 0.1s both" }}>
               {/* Game 1: Camino a la Fama — compact CTA card */}
-              <CaminoCTA gens={gens} onEnter={() => setSubPage("camino")} />
+              {getFlag("CAMINO") && <CaminoCTA gens={gens} onEnter={() => setSubPage("camino")} />}
 
               {/* Game 2: Dice — compact card */}
-              <DiceCard onUpload={openUpload} />
+              {getFlag("DICE") && <DiceCard onUpload={openUpload} />}
 
               {/* Game 3: The Album — SOON */}
-              <AlbumCard />
+              {getFlag("ALBUM") && <AlbumCard />}
 
               {/* Shared generations (pending + completed) */}
-              {sharedReqs.map(req => (
+              {getFlag("VIRAL_SHARE") && sharedReqs.map(req => (
                 <div key={`sh-${req.shareId}`} className="gen-card">
                   <SharedGenCard
                     req={req}

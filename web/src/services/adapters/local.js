@@ -1,10 +1,14 @@
 // ─────────────────────────────────────────────────────────
-//  Adaptador LOCAL — usa localStorage del navegador.
-//  Este es el backend activo durante el desarrollo inicial.
+// @STUB — Local persistence adapter (ACTIVE — demo only)
+// Status:    FUNCTIONAL but TEMPORARY — uses localStorage, not a real backend
+// Missing:   Replace with Firebase or Supabase adapter for production
+// Priority:  P0 — data is lost if user clears browser; no multi-device; no server-side backup
+// Effort:    0h here — implement firebase.js or supabase.js instead, then swap in services/index.js
+// Limits:    ~5MB storage cap, no auth/user scoping, single browser only
 //
-//  Para cambiar a Supabase o Firebase:
-//    1. Crea adapters/supabase.js con la misma interfaz
-//    2. Cambia la línea de exportación en services/index.js
+//  To switch to Supabase or Firebase:
+//    1. Implement adapters/firebase.js (or supabase.js) with the same interface
+//    2. Change the export line in services/index.js
 // ─────────────────────────────────────────────────────────
 
 const KEY = "celebs_db_v1";
@@ -67,7 +71,7 @@ export async function saveGeneration({ photoUrl, celeb, others }) {
   try {
     localStorage.setItem(KEY, JSON.stringify(all));
   } catch {
-    // Storage lleno — elimina el más antiguo y reintenta
+    // Storage full — drop the oldest entry and retry
     const trimmed = [gen, ...getAll().slice(0, -1)];
     try { localStorage.setItem(KEY, JSON.stringify(trimmed)); } catch { /* silent */ }
   }

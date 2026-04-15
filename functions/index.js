@@ -1,3 +1,12 @@
+// @STUB — Firebase Cloud Functions (code complete, but secrets NOT configured)
+// Status:    CODE READY but NOT DEPLOYED — secrets must be set before deploy
+// Missing:   1. Set secrets: firebase functions:secrets:set LEMON_SQUEEZY_API_KEY
+//            2. Set secrets: firebase functions:secrets:set LEMON_SQUEEZY_WEBHOOK_SECRET
+//            3. Set secrets: firebase functions:secrets:set LEMON_SQUEEZY_STORE_ID
+//            4. Deploy: firebase deploy --only functions
+//            5. Configure Lemon Squeezy webhook URL pointing to lemonSqueezyWebhook endpoint
+// Priority:  P0 — payments don't work without this
+// Effort:    ~1h — follow LEMON_SQUEEZY_SETUP.md step by step
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");

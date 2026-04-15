@@ -1,7 +1,7 @@
 import { colors, fontImport } from "./tokens";
 
-// CSS global inyectado una sola vez en App.jsx
-// Separado aquí para que el equipo de producto pueda encontrarlo fácilmente.
+// Global CSS injected once in App.jsx
+// Kept separate so the product team can find and edit it easily.
 export const globalCSS = `
   @import url('${fontImport}');
   * { margin: 0; padding: 0; box-sizing: border-box; }

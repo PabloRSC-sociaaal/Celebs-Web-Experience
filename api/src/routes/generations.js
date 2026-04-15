@@ -1,7 +1,8 @@
 // ─────────────────────────────────────────────────────────
-//  Generations route — STUB
-//  El equipo de devs conectará aquí la base de datos real
-//  (Supabase, Firebase, PostgreSQL, etc.)
+// @STUB — Generations REST endpoints
+// Status:    DUMMY — returns empty arrays / logs to console, no real persistence
+// Missing:   Database integration, user auth check, image storage
+// Priority:  P1 — see api/src/index.js for full context
 // ─────────────────────────────────────────────────────────
 
 import { Router } from "express";
@@ -9,19 +10,19 @@ import { Router } from "express";
 const router = Router();
 
 // GET /api/generations
-// Devuelve todas las generaciones del usuario (stub: array vacío)
+// Returns all generations for the authenticated user (stub: empty array)
 router.get("/", (_req, res) => {
-  // TODO (devs): conectar a BD real y filtrar por usuario autenticado
+  // TODO: connect to real DB and filter by authenticated user
   res.json({ data: [], total: 0 });
 });
 
 // POST /api/generations
-// Guarda una nueva generación
+// Saves a new generation
 router.post("/", (req, res) => {
   const { photoUrl, celeb, others } = req.body;
   if (!celeb) return res.status(400).json({ error: "celeb is required" });
 
-  // TODO (devs): guardar en BD real
+  // TODO: save to real DB
   const stub = {
     id: Date.now().toString(),
     createdAt: new Date().toISOString(),
@@ -38,7 +39,7 @@ router.post("/", (req, res) => {
 // DELETE /api/generations/:id
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  // TODO (devs): borrar de BD real
+  // TODO: delete from real DB
   console.log("[stub] deleteGeneration:", id);
   res.json({ success: true });
 });
@@ -47,7 +48,7 @@ router.delete("/:id", (req, res) => {
 router.patch("/:id/label", (req, res) => {
   const { id } = req.params;
   const { label, labelSub } = req.body;
-  // TODO (devs): actualizar en BD real
+  // TODO: update in real DB
   console.log("[stub] updateLabel:", id, label, labelSub);
   res.json({ success: true });
 });

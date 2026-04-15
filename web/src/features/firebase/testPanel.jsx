@@ -1,11 +1,12 @@
 /**
- * Firebase Cloud Function — Test Panel
+ * @STUB — Firebase Cloud Function Test Panel (DEV ONLY — remove before production)
+ * Status:    DEV TOOL — not for end users, must be removed before launch
+ * Missing:   Removal from DashboardPage.jsx import + component tree
+ * Priority:  P0 — security risk if deployed (exposes API internals)
+ * Effort:    5min — delete file + remove import/usage from DashboardPage.jsx
  *
  * Small floating button (bottom-left corner) that opens a debug panel
  * to test GenerateComparisonAsync without touching the main app flow.
- *
- * USAGE: drop <FirebaseTestPanel /> anywhere in the component tree.
- * Remove when done testing.
  */
 
 import { useState, useRef } from "react";

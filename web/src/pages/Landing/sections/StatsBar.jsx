@@ -1,3 +1,8 @@
+// @STUB — Stats bar with hardcoded vanity metrics
+// Status:    DUMMY — numbers are hardcoded, not fetched from any real source
+// Missing:   Real metrics from backend (total users, photos, countries, celebs)
+// Priority:  P2 — cosmetic; update when real data exists
+// Effort:    ~1h — fetch from API or Firestore aggregate, or use analytics data
 import { colors, fonts } from "../../../design/tokens";
 import { Counter } from "../../../components/Counter";
 
