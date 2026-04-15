@@ -4,6 +4,17 @@ Historial de cambios por sesión de trabajo. Formato: fecha estimada · commit �
 
 ---
 
+## [0.7.2] — 2026-04-15
+
+### chore: handoff-ready repository
+
+- **README.md** (English): clone → `npm run setup` → copy `*.env.example` → `npm run dev`; links to `CLAUDE.md`, `PRODUCTION_READINESS.md`, `LEMON_SQUEEZY_SETUP.md`.
+- **`web/.env.example`** + **`functions/.env.example`** added; **`api/.env.example`** updated (`CORS_ORIGIN` default `http://localhost:5174`).
+- **`package.json`**: `install:all` now includes `functions/`; new script **`npm run setup`** = root install + `install:all`.
+- **Git**: all pending changes committed on `main` for a clean transfer (push to your private remote when ready).
+
+---
+
 ## [0.7.1] — 2026-04-15
 
 ### docs: @STUB audit — 18 módulos dummy catalogados con prioridades
