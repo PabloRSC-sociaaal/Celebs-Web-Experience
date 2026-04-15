@@ -27,7 +27,6 @@ celebs-preview/
 ├── CHANGELOG.md    ← history of features by session
 ├── PRODUCTION_READINESS.md ← ★ @STUB audit: 18 modules cataloged with priorities
 ├── LEMON_SQUEEZY_SETUP.md  ← step-by-step payment setup guide
-└── OPENCLAW_RESET_CHECKLIST.md ← deployment checklist
 ```
 
 ### Root scripts
