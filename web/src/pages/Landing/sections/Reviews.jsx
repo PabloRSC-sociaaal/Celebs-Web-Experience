@@ -1,5 +1,6 @@
 import { colors, fonts } from "../../../design/tokens";
 import { Stars }         from "../../../components/Stars";
+import { useCtaUpload }  from "../../../hooks/useCtaUpload";
 
 const REVIEWS = [
   { name: "Sarah K.", text: "I can't believe how accurate it is! My whole family couldn't stop laughing.", stars: 5, match: "Shakira 94%" },
@@ -9,8 +10,11 @@ const REVIEWS = [
 ];
 
 export function Reviews() {
+  const { triggerUpload, inputProps } = useCtaUpload();
+
   return (
     <section style={{ background: `linear-gradient(180deg, #0a0a1a, ${colors.black})`, padding: "90px 24px" }}>
+      <input {...inputProps} />
       <div style={{ maxWidth: 1140, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <div style={{
@@ -38,6 +42,47 @@ export function Reviews() {
               </div>
             </div>
           ))}
+
+          {/* ── CTA Review Card ── */}
+          <div
+            onClick={triggerUpload}
+            className="review-card"
+            style={{
+              background: `linear-gradient(135deg, ${colors.yellow}12, ${colors.blue}12)`,
+              border: `2px solid ${colors.yellow}44`,
+              borderRadius: 18, padding: 24,
+              transition: "all 0.3s ease", cursor: "pointer",
+              display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center",
+              textAlign: "center", gap: 12,
+              minHeight: 200,
+            }}
+          >
+            <div style={{ fontSize: 40 }}>🎯</div>
+            <div style={{
+              fontFamily: fonts.display, fontSize: "clamp(18px, 2.5vw, 22px)",
+              fontWeight: 700, color: colors.yellow, lineHeight: 1.2,
+            }}>
+              The next one to freak out<br />is going to be you
+            </div>
+            <p style={{
+              fontFamily: fonts.body, fontSize: 12, fontWeight: 500,
+              color: "rgba(255,255,255,0.5)", lineHeight: 1.5,
+            }}>
+              Upload your photo and discover your celebrity match in seconds.
+            </p>
+            <div style={{
+              marginTop: 4, padding: "12px 28px",
+              background: colors.yellow, color: colors.black,
+              borderRadius: 12, fontFamily: fonts.body, fontSize: 14,
+              fontWeight: 800, textTransform: "uppercase", letterSpacing: 1,
+              border: `3px solid ${colors.black}`,
+              boxShadow: `4px 4px 0 ${colors.black}`,
+              transition: "all 0.2s",
+            }}>
+              📸 Find My Doppelganger
+            </div>
+          </div>
         </div>
       </div>
     </section>

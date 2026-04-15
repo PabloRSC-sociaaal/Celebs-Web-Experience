@@ -44,13 +44,18 @@ export const globalCSS = `
   .use-card:hover    { transform: rotate(-1deg) scale(1.04) !important; }
   .cta-main          { animation: ctaPulse 2.4s ease-in-out infinite !important; }
 
+  /* ── 860 px and below (tablet portrait + mobile) ── */
   @media (max-width: 860px) {
+    .nav-desktop      { display: none !important; }
+    .nav-mobile-right { display: flex !important; }
+    .nav-mobile-menu  { display: block !important; }
+    .hero-section { padding: 80px 20px 32px !important; }
     .hero-grid    { flex-direction: column !important; text-align: center !important; align-items: center !important; gap: 28px !important; }
     .hero-left    { align-items: center !important; }
     .hero-left .hero-badge { align-self: center !important; }
     .hero-left > a { align-self: center !important; }
     .hero-visual  { display: flex !important; justify-content: center !important; width: 100% !important; }
-    .hero-upload  { width: min(400px, 92vw) !important; }
+    .hero-upload  { width: min(380px, 88vw) !important; }
     .hero-stats   { justify-content: center !important; }
     .steps-row    { flex-direction: column !important; align-items: center !important; }
     .excl-grid    { flex-direction: column !important; align-items: center !important; text-align: center !important; }
@@ -61,15 +66,18 @@ export const globalCSS = `
     .footer-inner { flex-direction: column !important; gap: 24px !important; text-align: center !important; }
     .how-demo     { flex-direction: column !important; }
   }
+
+  /* ── 600 px and below (mobile) ── */
   @media (max-width: 600px) {
-    .nav-links      { display: none !important; }
-    .hero-section   { padding: 82px 16px 36px !important; }
-    .hero-upload    { width: calc(100vw - 32px) !important; max-width: 100% !important; }
-    .upload-cta-btn { width: 100% !important; }
+    .hero-section   { padding: 72px 16px 24px !important; }
+    .hero-upload    { width: calc(100vw - 48px) !important; max-width: 360px !important; }
+    .upload-cta-btn { width: 90% !important; }
     .hero-stats     { gap: 8px !important; font-size: 12px !important; }
     .hero-stats-sep { display: none !important; }
     .footer-links   { flex-wrap: wrap !important; gap: 12px !important; justify-content: center !important; }
   }
+
+  /* ── 400 px and below (small phones) ── */
   @media (max-width: 400px) {
     .gallery-grid { grid-template-columns: 1fr !important; }
   }

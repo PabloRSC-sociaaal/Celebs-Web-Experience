@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useAppStore } from "./store/appStore";
 
 const C = {
   blue: "#2AABE2", yellow: "#FFE500", black: "#0A0A0A", white: "#FFFFFF",
@@ -43,7 +44,7 @@ const LINES = [
   [0,6],[3,7],[22,30],[9,12],[13,17],[20,28],
 ];
 
-export default function AnalyzingPage({ photo, onComplete }) {
+export default function AnalyzingPage({ photo, onComplete, onCancel, faceGeometry }) {
   const [progress, setProgress]     = useState(0);
   const [stageIdx, setStageIdx]     = useState(0);
   const [dotsShown, setDotsShown]   = useState(0);
@@ -85,16 +86,16 @@ export default function AnalyzingPage({ photo, onComplete }) {
   }, [onComplete]);
 
   const stage = STAGES[stageIdx];
-  const photoSize = "clamp(260px, 38vw, 420px)";
+  const photoSize = "clamp(220px, 72vw, 420px)";
 
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 300,
       background: "#050812",
       display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
+      alignItems: "center",
       fontFamily: "'Oxanium', sans-serif",
-      overflow: "hidden",
+      overflowY: "auto", overflowX: "hidden",
     }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Oxanium:wght@400;500;600;700;800&display=swap');
@@ -165,6 +166,15 @@ export default function AnalyzingPage({ photo, onComplete }) {
         ● AI FACIAL ANALYSIS ACTIVE
       </div>
 
+      {/* Scroll-safe center wrapper: margin auto centers when content fits,
+         collapses to 0 when it overflows so the top is never clipped */}
+      <div style={{
+        margin: "auto 0",
+        display: "flex", flexDirection: "column", alignItems: "center",
+        padding: "20px 0",
+        flexShrink: 0,
+      }}>
+
       {/* ── Main photo container ── */}
       <div style={{
         position: "relative",
@@ -173,20 +183,22 @@ export default function AnalyzingPage({ photo, onComplete }) {
         animation: "photoReveal 0.6s cubic-bezier(0.34,1.56,0.64,1) both",
       }}>
 
-        {/* Photo */}
+        {/* Photo — already face-aligned by renderFaceAligned (640x640) */}
         <img src={photo} alt="Analyzing" style={{
           width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: "top center",
+          objectFit: "cover", objectPosition: "center center",
           borderRadius: 8,
           filter: `brightness(${matchFound ? 1.1 : 0.8}) saturate(${matchFound ? 1.2 : 1})`,
           transition: "filter 0.8s ease",
           display: "block",
         }} />
 
-        {/* Face detection box */}
+        {/* Face detection box — positioned for the face-aligned output image.
+           renderFaceAligned always places the face at known coordinates:
+           center (50%, 45%), height 46% of output. */}
         <div style={{
           position: "absolute",
-          top: "12%", left: "16%", right: "16%", bottom: "10%",
+          top: "18%", left: "22%", width: "56%", height: "54%",
           border: `1.5px solid ${C.blue}66`,
           borderRadius: 6,
           animation: "gridFadeIn 0.4s ease-out 0.8s both",
@@ -263,7 +275,7 @@ export default function AnalyzingPage({ photo, onComplete }) {
       </div>
 
       {/* ── Info panel ── */}
-      <div style={{ marginTop: 36, textAlign: "center", width: "100%", maxWidth: 520, padding: "0 24px", zIndex: 1 }}>
+      <div style={{ marginTop: 36, textAlign: "center", width: "100%", maxWidth: 520, padding: "0 clamp(12px, 4vw, 32px)", zIndex: 1 }}>
 
         {/* Stage text */}
         <div key={stageIdx} style={{
@@ -271,7 +283,7 @@ export default function AnalyzingPage({ photo, onComplete }) {
         }}>
           <div style={{
             fontFamily: "'Fredoka'", fontWeight: 700,
-            fontSize: "clamp(16px, 2.5vw, 24px)",
+            fontSize: "clamp(14px, 3.5vw, 18px)",
             color: matchFound ? C.yellow : C.white,
             letterSpacing: 0.5,
             transition: "color 0.5s ease",
@@ -279,7 +291,7 @@ export default function AnalyzingPage({ photo, onComplete }) {
             {stage.icon} {stage.text}
           </div>
           <div style={{
-            fontFamily: "'Oxanium'", fontSize: "clamp(10px, 1.4vw, 12px)", fontWeight: 500,
+            fontFamily: "'Oxanium'", fontSize: "clamp(11px, 2.5vw, 13px)", fontWeight: 500,
             color: "rgba(255,255,255,0.4)", marginTop: 6, letterSpacing: 0.5,
           }}>
             {stage.sub}
@@ -318,6 +330,8 @@ export default function AnalyzingPage({ photo, onComplete }) {
         </div>
       </div>
 
+      </div>{/* end scroll-safe center wrapper */}
+
       {/* ── Logo watermark ── */}
       <div style={{ position: "absolute", bottom: 20, left: "50%", transform: "translateX(-50%)", opacity: 0.25 }}>
         <svg width={80} height={26} viewBox="0 0 80 26">
@@ -325,6 +339,27 @@ export default function AnalyzingPage({ photo, onComplete }) {
             fontSize="20" fill="#fff" stroke={C.yellow} strokeWidth="3" strokeLinejoin="round" paintOrder="stroke">celebs</text>
         </svg>
       </div>
+
+      {/* ── Cancel / change photo ── only shown before match found ── */}
+      {onCancel && !matchFound && (
+        <div style={{ position:"absolute", bottom:60, left:"50%", transform:"translateX(-50%)" }}>
+          <button
+            onClick={onCancel}
+            style={{
+              background:"rgba(255,255,255,0.06)",
+              border:"1px solid rgba(255,255,255,0.12)",
+              borderRadius:20, padding:"8px 20px", cursor:"pointer",
+              fontFamily:"'Oxanium'", fontWeight:600, fontSize:12,
+              color:"rgba(255,255,255,0.35)",
+              transition:"all 0.2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.color="rgba(255,255,255,0.7)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.3)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color="rgba(255,255,255,0.35)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.12)"; }}
+          >
+            ← Change photo
+          </button>
+        </div>
+      )}
     </div>
   );
 }

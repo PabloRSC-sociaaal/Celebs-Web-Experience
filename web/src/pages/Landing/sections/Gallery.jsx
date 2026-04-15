@@ -1,6 +1,7 @@
 import { colors, fonts } from "../../../design/tokens";
 import { Button }        from "../../../components/Button";
 import { PolaroidCard }  from "../../../components/PolaroidCard";
+import { useCtaUpload }  from "../../../hooks/useCtaUpload";
 
 const GALLERY = [
   { n: "Michael B. Jordan", p: 94, c: colors.blue,   r: -3, user: "/samples/user1.jpg", celeb: "/samples/celeb_michael_jordan.jpg" },
@@ -14,8 +15,11 @@ const GALLERY = [
 ];
 
 export function Gallery() {
+  const { triggerUpload, inputProps } = useCtaUpload();
+
   return (
     <section id="results" style={{ background: colors.black, padding: "90px 24px", position: "relative" }}>
+      <input {...inputProps} />
       <div style={{ maxWidth: 1140, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <h2 style={{ fontFamily: fonts.display, fontSize: "clamp(36px, 5vw, 54px)", fontWeight: 700, color: colors.yellow, textShadow: `3px 3px 0 ${colors.blue}` }}>
@@ -31,7 +35,7 @@ export function Gallery() {
           ))}
         </div>
         <div style={{ textAlign: "center", marginTop: 44 }}>
-          <Button size="lg">Find My Doppelganger</Button>
+          <Button size="lg" onClick={triggerUpload}>Find My Doppelganger</Button>
         </div>
       </div>
     </section>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { colors, fonts } from "../../design/tokens";
 import { Button } from "../Button";
 import { detectAndCropFace } from "../../features/face/detect";
+import { useAppStore } from "../../store/appStore";
 
 const STEPS = [
   { icon: "📸", label: "Loading your photo" },
@@ -16,13 +17,35 @@ export function HeroUpload({ onStartScan, onSpotlight }) {
   const [croppedUrl, setCroppedUrl] = useState(null);
   const [phase,      setPhase]      = useState("idle"); // idle | validating | ready | error
   const [stepIdx,    setStepIdx]    = useState(0);
-  const inputRef = useRef(null);
+  const inputRef     = useRef(null);
+  const wrapperRef   = useRef(null);
+
+  const pendingFile      = useAppStore(s => s.pendingFile);
+  const setPendingFile   = useAppStore(s => s.setPendingFile);
+  const setFaceGeometry  = useAppStore(s => s.setFaceGeometry);
 
   useEffect(() => {
     if (phase !== "validating") return;
     const id = setInterval(() => setStepIdx(i => (i + 1) % STEPS.length), 500);
     return () => clearInterval(id);
   }, [phase]);
+
+  // Scroll the widget into view when face detected (spotlight on)
+  useEffect(() => {
+    if (phase === "ready" && wrapperRef.current) {
+      setTimeout(() => {
+        wrapperRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }, [phase]);
+
+  // Pick up files sent from any CTA via the store
+  useEffect(() => {
+    if (!pendingFile) return;
+    setPendingFile(null);
+    handleFile(pendingFile);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingFile]);
 
   const handleFile = async (file) => {
     if (!file || !file.type.startsWith("image/")) return;
@@ -35,9 +58,11 @@ export function HeroUpload({ onStartScan, onSpotlight }) {
       const result = await detectAndCropFace(raw);
       if (!result.found) {
         setPhase("error");
+        setFaceGeometry(null);
         onSpotlight?.(false);
       } else {
         setCroppedUrl(result.croppedUrl);
+        setFaceGeometry(result.faceGeometry ?? null);
         setPhase("ready");
         onSpotlight?.(true);
       }
@@ -104,10 +129,10 @@ export function HeroUpload({ onStartScan, onSpotlight }) {
       </div>
       <div className="upload-cta-btn cta-main" style={{
         marginTop: 4, background: colors.yellow, color: colors.black,
-        fontFamily: fonts.body, fontWeight: 800, fontSize: 15,
-        padding: "16px 0", borderRadius: 14, border: `3px solid ${colors.black}`,
+        fontFamily: fonts.body, fontWeight: 800, fontSize: 14,
+        padding: "14px 0", borderRadius: 14, border: `3px solid ${colors.black}`,
         boxShadow: `4px 4px 0 ${colors.black}`, letterSpacing: 1.2,
-        textTransform: "uppercase", textAlign: "center", width: "85%",
+        textTransform: "uppercase", textAlign: "center", width: "75%",
       }}>
         📸 Choose Photo
       </div>
@@ -187,14 +212,14 @@ export function HeroUpload({ onStartScan, onSpotlight }) {
   );
 
   return (
-    <div className="hero-upload" style={{
+    <div ref={wrapperRef} className="hero-upload" style={{
       width: 360, maxWidth: "100%", borderRadius: 28, background: colors.black,
       border: `3px solid ${colors.yellow}`, overflow: "hidden",
       boxShadow: `0 0 0 6px ${colors.yellow}22, 0 0 60px ${colors.yellow}33, 0 24px 60px rgba(0,0,0,0.5)`,
       animation: "slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1)",
     }}>
       <div style={{ position: "relative", width: "100%", aspectRatio: "1 / 1", overflow: "hidden" }}>
-        <img src={croppedUrl} alt="your face" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }} />
+        <img src={croppedUrl} alt="your face" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center", display: "block" }} />
         <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 80, background: `linear-gradient(transparent, ${colors.black})`, pointerEvents: "none" }} />
         <div style={{
           position: "absolute", top: 12, left: 12, background: `${colors.green}ee`,

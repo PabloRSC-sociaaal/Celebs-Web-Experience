@@ -6,7 +6,12 @@ const ITEMS = [
 
 export function Marquee() {
   return (
-    <div style={{ overflow: "hidden", width: "100%", padding: "14px 0" }}>
+    <div style={{
+      overflow: "hidden", width: "100%", padding: "14px 0",
+      position: "relative",
+      maskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
+      WebkitMaskImage: "linear-gradient(to right, transparent, black 12%, black 88%, transparent)",
+    }}>
       <div style={{ display: "flex", gap: 12, animation: "marquee 40s linear infinite", width: "max-content" }}>
         {[...ITEMS, ...ITEMS].map((item, i) => (
           <div key={i} style={{

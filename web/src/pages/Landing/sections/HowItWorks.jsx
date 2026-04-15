@@ -2,6 +2,7 @@ import { colors, fonts } from "../../../design/tokens";
 import { Button }         from "../../../components/Button";
 import { ScanningVisual } from "../../../components/ScanningVisual";
 import { ResultPreview }  from "../../../components/ResultPreview";
+import { useCtaUpload }   from "../../../hooks/useCtaUpload";
 
 const STEPS = [
   { step: "01", icon: "📸", title: "Upload your selfie",       desc: "Drag your photo or take one with your webcam. No sign-up needed.",                                        color: colors.yellow },
@@ -10,8 +11,11 @@ const STEPS = [
 ];
 
 export function HowItWorks() {
+  const { triggerUpload, inputProps } = useCtaUpload();
+
   return (
     <section id="how-it-works" className="halftone-light" style={{ background: colors.black, padding: "90px 24px", position: "relative" }}>
+      <input {...inputProps} />
       <div style={{ maxWidth: 1140, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <div style={{
@@ -58,7 +62,7 @@ export function HowItWorks() {
         </div>
 
         <div style={{ textAlign: "center", marginTop: 48 }}>
-          <Button size="lg">Try It Now — Free</Button>
+          <Button size="lg" onClick={triggerUpload}>Try It Now — Free</Button>
         </div>
       </div>
     </section>
