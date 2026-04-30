@@ -14,7 +14,7 @@ export function PolaroidCard({ name, pct, color = colors.blue, rotation = 0, del
         boxShadow: hover ? "0 16px 40px rgba(0,0,0,0.4)" : "0 8px 24px rgba(0,0,0,0.25)",
         transform: `rotate(${hover ? 0 : rotation}deg) scale(${hover ? 1.08 : 1})`,
         transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-        width: 160, cursor: "default",
+        width: "min(160px, 100%)", cursor: "default",
         animation: `floatCard 4s ease-in-out infinite`,
         animationDelay: `${delay}s`,
       }}

@@ -79,6 +79,7 @@ export const globalCSS = `
 
   /* ── 400 px and below (small phones) ── */
   @media (max-width: 400px) {
-    .gallery-grid { grid-template-columns: 1fr !important; }
+    .hero-section   { padding: 64px 12px 20px !important; }
+    .steps-row > *  { max-width: 100% !important; }
   }
 `;

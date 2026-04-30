@@ -83,9 +83,7 @@ export function LandingPage() {
           display: "flex", justifyContent: "space-between", alignItems: "center",
         }}>
           {/* Logo */}
-          <div style={{ transform: "scale(0.5)", transformOrigin: "left center", flexShrink: 0 }}>
-            <Logo size={38} />
-          </div>
+          <Logo size={20} />
 
           {/* Desktop links */}
           <div className="nav-desktop" style={{ display: "flex", gap: 20, alignItems: "center" }}>
@@ -321,9 +319,7 @@ export function LandingPage() {
       <footer style={{ background: colors.black, borderTop: `3px solid ${colors.yellow}`, padding: "40px 24px 28px" }}>
         <div className="footer-inner" style={{ maxWidth: 1140, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
           <div>
-            <div style={{ transform: "scale(0.5)", transformOrigin: "left center" }}>
-              <Logo size={36} />
-            </div>
+            <Logo size={18} />
             <p style={{ fontFamily: fonts.body, fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4, fontWeight: 400 }}>
               The #1 AI Celebrity Doppelganger Platform
             </p>
