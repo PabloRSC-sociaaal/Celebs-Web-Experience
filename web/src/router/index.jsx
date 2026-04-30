@@ -17,4 +17,4 @@ export const router = createBrowserRouter([
   { path: "/results",       element: <ResultsPage /> },
   { path: "/dashboard",     element: <DashboardPage /> },
   { path: "/share/:shareId", element: getFlag("VIRAL_SHARE") ? <SharePage /> : <Navigate to="/" replace /> },
-], { basename: '/Celebs-Web-Experience/' });
+]);

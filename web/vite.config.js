@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/Celebs-Web-Experience/',
+  base: '/',
   server: {
     port: process.env.PORT ? parseInt(process.env.PORT) : 5174,
     strictPort: false,
