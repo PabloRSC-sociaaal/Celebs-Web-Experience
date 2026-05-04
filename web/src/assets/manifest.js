@@ -42,17 +42,23 @@ export const USERS = {
 
 // ── SimilarityExplorer brackets (each bracket needs a pair of comparison images) ──
 export const SIMILARITY_BRACKETS = {
-  bracket_0_10:   { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_11_20:  { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_21_30:  { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_31_40:  { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_41_50:  { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_51_60:  { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_61_70:  { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_71_80:  { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_81_90:  { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
-  bracket_91_100: { left: null, right: null, status: STATUS.PLACEHOLDER, note: "FacePlaceholder SVG used" },
+  bracket_0_10:   { left: "/samples/bracket_0_10_left.png",   right: "/samples/bracket_0_10_right.png",   status: STATUS.FINAL,       note: "Egg vs Dwayne Johnson" },
+  bracket_11_20:  { left: "/samples/bracket_11_20_left.png",  right: "/samples/bracket_11_20_right.png",  status: STATUS.FINAL,       note: "Egyptian statue vs Michael Jackson" },
+  bracket_21_30:  { left: "/samples/bracket_21_30_left.png",  right: "/samples/bracket_21_30_right.png",  status: STATUS.FINAL,       note: "Botero painting vs Bella Ramsey" },
+  bracket_31_40:  { left: "/samples/bracket_31_40_left.png",  right: "/samples/bracket_31_40_right.png",  status: STATUS.FINAL,       note: "Hasbulla vs Daniel Radcliffe" },
+  bracket_41_50:  { left: "/samples/bracket_41_50_left.png",  right: "/samples/bracket_41_50_right.png",  status: STATUS.FINAL,       note: "Indian elder vs George Clooney" },
+  bracket_51_60:  { left: "/samples/bracket_51_60_left.png",  right: "/samples/bracket_51_60_right.png",  status: STATUS.FINAL,       note: "Young man w/ bowtie vs Timothée Chalamet" },
+  bracket_61_70:  { left: "/samples/bracket_61_70_left.png",  right: "/samples/bracket_61_70_right.png",  status: STATUS.FINAL,       note: "Latin girl w/ mic vs Zendaya" },
+  bracket_71_80:  { left: "/samples/bracket_71_80_left.png",  right: "/samples/bracket_71_80_right.png",  status: STATUS.FINAL,       note: "Bob woman vs Dua Lipa" },
+  bracket_81_90:  { left: "/samples/bracket_81_90_left.png",  right: "/samples/bracket_81_90_right.png",  status: STATUS.FINAL,       note: "Matt Bomer vs Henry Cavill" },
+  bracket_91_100: { left: null, right: null, status: STATUS.PLACEHOLDER, note: "Intentionally blank — represents the user themselves" },
 };
+
+/** Get a bracket image pair by bracket key (e.g. 'bracket_41_50') */
+export function bracketImg(key) {
+  const b = SIMILARITY_BRACKETS[key];
+  return b ? { left: b.left, right: b.right } : { left: null, right: null };
+}
 
 // ── Branding & UI ────────────────────────────────────────────────────────────
 export const BRANDING = {

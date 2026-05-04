@@ -1,48 +1,79 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { colors, fonts } from "../../../design/tokens";
 import { useCtaUpload }  from "../../../hooks/useCtaUpload";
+import { bracketImg }    from "../../../assets/manifest";
 
 // ── Data for each 10 % bracket ──────────────────────────────
 const BRACKETS = [
-  { min: 0,  max: 10,  label: "No Match",          color: "#ef4444", emoji: "❌", desc: "Completely different facial structures — the algorithm finds zero connection.",             pair: "Random strangers" },
-  { min: 11, max: 20,  label: "Very Low",           color: "#f97316", emoji: "😕", desc: "Almost nothing in common. Different face shapes, features and proportions.",               pair: "Unrelated people" },
-  { min: 21, max: 30,  label: "Slight Resemblance", color: "#f59e0b", emoji: "🤔", desc: "A couple of features vaguely align — maybe eye shape or nose width.",                     pair: "Co-workers who 'kinda look alike'" },
-  { min: 31, max: 40,  label: "Some Features",      color: "#eab308", emoji: "👀", desc: "A few matching landmarks are detected. Noticeable but still faint.",                       pair: "Distant relatives" },
-  { min: 41, max: 50,  label: "Moderate Match",     color: "#84cc16", emoji: "😮", desc: "Several facial landmarks overlap. Friends might say 'you look a bit like…'",              pair: "Friends who get confused" },
-  { min: 51, max: 60,  label: "Notable",            color: "#22c55e", emoji: "😲", desc: "Strong alignment in key features. The resemblance is hard to deny.",                       pair: "Siblings" },
-  { min: 61, max: 70,  label: "Striking",           color: "#14b8a6", emoji: "🔥", desc: "People would stop you on the street. Multiple feature groups match.",                      pair: "Parent & child" },
-  { min: 71, max: 80,  label: "High Similarity",    color: "#06b6d4", emoji: "⚡", desc: "The algorithm lights up. Very close mapping across bone structure & eye spacing.",         pair: "Lookalikes" },
-  { min: 81, max: 90,  label: "Near Match",         color: "#8b5cf6", emoji: "🤯", desc: "Jaw, cheekbones, eye spacing — almost identical. So close, yet not quite…",               pair: "Identical twins" },
-  { min: 91, max: 100, label: "DOPPELGANGER",       color: colors.yellow, emoji: "🎯", desc: "Over 90 % facial match. You've crossed the threshold. You ARE the celebrity.", pair: "Celebrity & their Doppelganger" },
+  { min: 0,  max: 10,  key: "bracket_0_10",   label: "No Match",          color: "#ef4444", emoji: "❌", desc: "Completely different facial structures — the algorithm finds zero connection.",             pair: "Random strangers" },
+  { min: 11, max: 20,  key: "bracket_11_20",  label: "Very Low",           color: "#f97316", emoji: "😕", desc: "Almost nothing in common. Different face shapes, features and proportions.",               pair: "Unrelated people" },
+  { min: 21, max: 30,  key: "bracket_21_30",  label: "Slight Resemblance", color: "#f59e0b", emoji: "🤔", desc: "A couple of features vaguely align — maybe eye shape or nose width.",                     pair: "Co-workers who 'kinda look alike'" },
+  { min: 31, max: 40,  key: "bracket_31_40",  label: "Some Features",      color: "#eab308", emoji: "👀", desc: "A few matching landmarks are detected. Noticeable but still faint.",                       pair: "Distant relatives" },
+  { min: 41, max: 50,  key: "bracket_41_50",  label: "Moderate Match",     color: "#84cc16", emoji: "😮", desc: "Several facial landmarks overlap. Friends might say 'you look a bit like…'",              pair: "Friends who get confused" },
+  { min: 51, max: 60,  key: "bracket_51_60",  label: "Notable",            color: "#22c55e", emoji: "😲", desc: "Strong alignment in key features. The resemblance is hard to deny.",                       pair: "Siblings" },
+  { min: 61, max: 70,  key: "bracket_61_70",  label: "Striking",           color: "#14b8a6", emoji: "🔥", desc: "People would stop you on the street. Multiple feature groups match.",                      pair: "Parent & child" },
+  { min: 71, max: 80,  key: "bracket_71_80",  label: "High Similarity",    color: "#06b6d4", emoji: "⚡", desc: "The algorithm lights up. Very close mapping across bone structure & eye spacing.",         pair: "Lookalikes" },
+  { min: 81, max: 90,  key: "bracket_81_90",  label: "Near Match",         color: "#8b5cf6", emoji: "🤯", desc: "Jaw, cheekbones, eye spacing — almost identical. So close, yet not quite…",               pair: "Identical twins" },
+  { min: 91, max: 100, key: "bracket_91_100", label: "DOPPELGANGER",       color: colors.yellow, emoji: "🎯", desc: "Over 90 % facial match. You've crossed the threshold. You ARE the celebrity.", pair: "Celebrity & their Doppelganger" },
 ];
 
 function getBracket(val) {
   return BRACKETS.find(b => val >= b.min && val <= b.max) || BRACKETS[0];
 }
 
-// ── Placeholder face card (will be replaced with real photos) ──
-function FacePlaceholder({ label, dark }) {
+// ── Face card — shows real photo when src provided, falls back to SVG ──
+function FaceCard({ label, dark, src }) {
   return (
     <div style={{
       width: "100%", maxWidth: 130, aspectRatio: "3/4", borderRadius: 14,
       background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)",
-      border: `2px dashed ${dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
+      border: src
+        ? `2px solid ${dark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.18)"}`
+        : `2px dashed ${dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
+      overflow: "hidden", position: "relative",
       display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
       gap: 8, transition: "all 0.3s",
     }}>
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-        stroke={dark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.18)"}
-        strokeWidth="1.5" strokeLinecap="round">
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-      </svg>
-      <span style={{
-        fontFamily: fonts.body, fontSize: 9, fontWeight: 700,
-        color: dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
-        textTransform: "uppercase", letterSpacing: 1,
-      }}>
-        {label}
-      </span>
+      {src ? (
+        <>
+          <img
+            src={src}
+            alt={label}
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              objectFit: "cover", objectPosition: "center top",
+            }}
+          />
+          <span style={{
+            position: "absolute", bottom: 6, left: "50%",
+            transform: "translateX(-50%)",
+            background: "rgba(0,0,0,0.65)", color: "#fff",
+            fontFamily: fonts.body, fontSize: 9, fontWeight: 700,
+            textTransform: "uppercase", letterSpacing: 1,
+            padding: "3px 8px", borderRadius: 6,
+            whiteSpace: "nowrap",
+          }}>
+            {label}
+          </span>
+        </>
+      ) : (
+        <>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+            stroke={dark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.18)"}
+            strokeWidth="1.5" strokeLinecap="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+          </svg>
+          <span style={{
+            fontFamily: fonts.body, fontSize: 9, fontWeight: 700,
+            color: dark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
+            textTransform: "uppercase", letterSpacing: 1,
+          }}>
+            {label}
+          </span>
+        </>
+      )}
     </div>
   );
 }
@@ -60,6 +91,7 @@ export function SimilarityExplorer() {
 
   const bracket        = getBracket(value);
   const isDoppelganger = value >= 91;
+  const pairImages     = bracketImg(bracket.key);
 
   if (prevDoppel.current && !isDoppelganger) setSpotlightDismissed(false);
   prevDoppel.current = isDoppelganger;
@@ -259,7 +291,7 @@ export function SimilarityExplorer() {
             display: "flex", alignItems: "center", justifyContent: "center",
             gap: "clamp(12px, 3vw, 24px)", marginBottom: 14,
           }}>
-            <FacePlaceholder label={isDoppelganger ? "You" : "Person"} dark={isDoppelganger} />
+            <FaceCard label={isDoppelganger ? "You" : "Person"} dark={isDoppelganger} src={pairImages.left} />
 
             <div style={{
               minWidth: 68, height: 68, borderRadius: "50%",
@@ -275,7 +307,7 @@ export function SimilarityExplorer() {
               {value}%
             </div>
 
-            <FacePlaceholder label="Celebrity" dark={isDoppelganger} />
+            <FaceCard label="Celebrity" dark={isDoppelganger} src={pairImages.right} />
           </div>
 
           {/* Pair label — fixed height */}
