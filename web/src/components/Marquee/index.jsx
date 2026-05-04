@@ -8,7 +8,7 @@ const ITEMS = [
   { name: "Taylor Swift",      pct: 97, celeb: "/samples/celeb_taylor.jpg",         user: "/samples/user1.jpg" },
   { name: "Timothée Chalamet", pct: 94, celeb: "/samples/celeb_timothee.jpg",       user: "/samples/user3.jpg" },
   { name: "Zendaya",           pct: 96, celeb: "/samples/bracket_61_70_right.png",  user: "/samples/user2.jpg" },
-  { name: "Bad Bunny",         pct: 91, celeb: "/samples/celeb_harry.jpg",          user: "/samples/user4.jpg" },
+  { name: "Bad Bunny",         pct: 91, celeb: "/samples/celeb_bad_bunny.webp",     user: "/samples/user4.jpg" },
   { name: "Selena Gomez",      pct: 93, celeb: "/samples/celeb_selena.jpg",         user: "/samples/user5.jpg" },
   { name: "Henry Cavill",      pct: 89, celeb: "/samples/celeb_henry.jpg",          user: "/samples/user1.jpg" },
   { name: "Billie Eilish",     pct: 90, celeb: "/samples/celeb_billie.jpg",         user: "/samples/user3.jpg" },
@@ -16,6 +16,8 @@ const ITEMS = [
   { name: "Harry Styles",      pct: 87, celeb: "/samples/celeb_harry.jpg",          user: "/samples/user4.jpg" },
   { name: "Michael B. Jordan", pct: 88, celeb: "/samples/celeb_michael_jordan.jpg", user: "/samples/user1.jpg" },
   { name: "Dua Lipa",          pct: 95, celeb: "/samples/bracket_71_80_right.png",  user: "/samples/user5.jpg" },
+  { name: "Dwayne Johnson",    pct: 86, celeb: "/samples/bracket_0_10_right.png",   user: "/samples/user2.jpg" },
+  { name: "Sabrina Carpenter", pct: 93, celeb: "/samples/hero/sabrina.png",         user: "/samples/user5.jpg" },
 ];
 
 // Minutes-ago timestamp generator — varies by index so each "match" feels recent.

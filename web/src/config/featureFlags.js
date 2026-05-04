@@ -22,8 +22,8 @@ export const FLAG_DEFINITIONS = {
 
   // Dashboard features
   MORPH_BOOMERANG:     { enabled: true,  label: "Auto-morph animation on dashboard cards" },
-  CAMINO:              { enabled: true,  label: "Camino a la Fama game mode" },
-  DICE:                { enabled: true,  label: "Dice roll game mode" },
+  CAMINO:              { enabled: false, label: "Camino a la Fama game mode" },
+  DICE:                { enabled: false, label: "Dice roll game mode" },
   ALBUM:               { enabled: false, label: "Album feature (coming soon)" },
 
   // Monetization
