@@ -31,6 +31,10 @@ function HeroCeleb({ src, side = "left", style, enterDelay = 0, floatDelay = 0, 
             display: "block",
             filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.45))",
             userSelect: "none",
+            // Fade the top of each silhouette into the background so it never
+            // competes with the hero text above. Bottom 60 % fully opaque.
+            maskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 14%, rgba(0,0,0,0.85) 32%, black 42%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.35) 14%, rgba(0,0,0,0.85) 32%, black 42%)",
           }}
         />
         {/* AI scan line — sweeps vertically over the celebrity face */}
@@ -84,7 +88,7 @@ export function HeroSection() {
       <HeroCeleb
         src="/samples/hero/billie.png"
         side="left"
-        style={{ left: "-40px", bottom: "70px", height: "min(64vh, 520px)", "--celeb-op": 0.95 }}
+        style={{ left: "-90px", bottom: "10px", height: "min(48vh, 420px)", "--celeb-op": 0.92 }}
         enterDelay={0.15}
         floatDelay={0}
         scanDelay={1.2}
@@ -109,7 +113,9 @@ export function HeroSection() {
       <div className="hero-grid" style={{
         maxWidth: 1140, width: "100%", margin: "0 auto",
         display: "flex", gap: 48, alignItems: "center",
-        position: "relative", zIndex: 3,
+        // When spotlight is active the upload widget needs to escape above the
+        // 1000 z-index overlay; otherwise stay above the decorative celebs (z 1).
+        position: "relative", zIndex: spotlight ? 1002 : 3,
       }}>
         {/* ── Left column: text ── */}
         <div className="hero-left" style={{

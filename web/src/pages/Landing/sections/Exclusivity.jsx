@@ -89,6 +89,10 @@ export function Exclusivity() {
     return () => window.removeEventListener("scroll", calcProgress);
   }, [calcProgress]);
 
+  // ── "Don't stop scrolling" banner — visible at the very top of the section,
+  //    fades out as the user scrolls past 12 % so it doesn't fight Screen A.
+  const keepScrollOpacity = 1 - smoothstep(progress, 0.02, 0.12);
+
   return (
     <section
       ref={sectionRef}
@@ -99,6 +103,34 @@ export function Exclusivity() {
         zIndex: 1,
       }}
     >
+      {/* Top-of-section "keep scrolling" cue (mobile-friendly, visible immediately) */}
+      <div style={{
+        position: "absolute", top: 80, left: 0, right: 0,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", gap: 6,
+        opacity: keepScrollOpacity,
+        transition: "opacity 0.35s ease",
+        pointerEvents: "none",
+        zIndex: 5,
+      }}>
+        <span style={{
+          fontFamily: fonts.body, fontSize: 11, fontWeight: 800,
+          color: colors.black,
+          background: "rgba(0,0,0,0.08)",
+          border: `1.5px solid rgba(0,0,0,0.15)`,
+          borderRadius: 999, padding: "6px 14px",
+          textTransform: "uppercase", letterSpacing: 1.4,
+          whiteSpace: "nowrap",
+        }}>
+          Don't stop scrolling
+        </span>
+        <div style={{ animation: "floatCard 1.4s ease-in-out infinite" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke={colors.black} strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          </svg>
+        </div>
+      </div>
       <div
         style={{
           position: "sticky",

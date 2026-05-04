@@ -78,7 +78,8 @@ export const globalCSS = `
     .reviews-grid { grid-template-columns: 1fr !important; }
     .use-grid     { grid-template-columns: 1fr !important; }
     .stats-row    { flex-wrap: wrap !important; gap: 24px !important; }
-    .footer-inner { flex-direction: column !important; gap: 24px !important; text-align: center !important; }
+    .footer-inner { flex-direction: column !important; gap: 24px !important; text-align: center !important; align-items: center !important; }
+    .footer-inner > div { display: flex !important; flex-direction: column !important; align-items: center !important; }
     .how-demo     { flex-direction: column !important; }
   }
 
