@@ -881,27 +881,63 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
               cursor: "pointer", letterSpacing: 1.1, textTransform: "uppercase",
             }}>🚀 Get My Full Analysis</button>
 
-            {/* Viral share — opens the vertical share-card modal (Stories-ready) */}
-            {!needsPremium(celeb.pct) && (
-              <button
-                onClick={() => setShowShare(true)}
-                style={{
-                  width: "100%", padding: "clamp(13px, 2.8vw, 16px) 0",
-                  background: `linear-gradient(135deg, ${celeb.color || C.yellow}, ${C.yellow})`,
-                  color: C.black,
-                  fontFamily: "'Oxanium'", fontWeight: 800, fontSize: "clamp(13px, 3.5vw, 15px)",
-                  border: `3px solid ${C.black}`, borderRadius: 14,
-                  boxShadow: `4px 4px 0 ${C.black}, 0 0 24px ${(celeb.color || C.yellow)}66`,
-                  cursor: "pointer", letterSpacing: 1.2, textTransform: "uppercase",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                  transition: "transform 0.15s, box-shadow 0.15s",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translate(-2px,-2px)"; e.currentTarget.style.boxShadow = `6px 6px 0 ${C.black}, 0 0 32px ${(celeb.color || C.yellow)}88`; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = `4px 4px 0 ${C.black}, 0 0 24px ${(celeb.color || C.yellow)}66`; }}
-              >
-                📲 Share to Stories
-              </button>
-            )}
+            {/* Viral share — opens the vertical share-card modal when the
+                viewer is allowed to see the match. Otherwise the click
+                triggers the paywall / auth flow with a clear lock state. */}
+            {(() => {
+              const shareLocked = needsPremium(celeb.pct) || (!user && activeIdx !== freeIdx);
+              const shareReason = !user
+                ? "Sign up to share"
+                : shareLocked ? "Premium to share" : null;
+              return (
+                <button
+                  onClick={() => {
+                    if (shareLocked) handleUnlock();
+                    else setShowShare(true);
+                  }}
+                  style={{
+                    width: "100%", padding: "clamp(13px, 2.8vw, 16px) 0",
+                    background: shareLocked
+                      ? "rgba(255,255,255,0.06)"
+                      : `linear-gradient(135deg, ${celeb.color || C.yellow}, ${C.yellow})`,
+                    color: shareLocked ? C.yellow : C.black,
+                    fontFamily: "'Oxanium'", fontWeight: 800, fontSize: "clamp(13px, 3.5vw, 15px)",
+                    border: shareLocked
+                      ? `1.5px solid ${C.yellow}66`
+                      : `3px solid ${C.black}`,
+                    borderRadius: 14,
+                    boxShadow: shareLocked
+                      ? "none"
+                      : `4px 4px 0 ${C.black}, 0 0 24px ${(celeb.color || C.yellow)}66`,
+                    cursor: "pointer", letterSpacing: 1.2, textTransform: "uppercase",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                    transition: "transform 0.15s, box-shadow 0.15s",
+                  }}
+                  onMouseEnter={e => {
+                    if (shareLocked) {
+                      e.currentTarget.style.background = `${C.yellow}18`;
+                      e.currentTarget.style.borderColor = C.yellow;
+                    } else {
+                      e.currentTarget.style.transform = "translate(-2px,-2px)";
+                      e.currentTarget.style.boxShadow = `6px 6px 0 ${C.black}, 0 0 32px ${(celeb.color || C.yellow)}88`;
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (shareLocked) {
+                      e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                      e.currentTarget.style.borderColor = `${C.yellow}66`;
+                    } else {
+                      e.currentTarget.style.transform = "none";
+                      e.currentTarget.style.boxShadow = `4px 4px 0 ${C.black}, 0 0 24px ${(celeb.color || C.yellow)}66`;
+                    }
+                  }}
+                >
+                  {shareLocked
+                    ? <>🔒 Share — {shareReason}</>
+                    : <>📲 Share to Stories</>}
+                </button>
+              );
+            })()}
 
             {/* Compact secondary share row — kept for fast direct posts */}
             <div className="res-share-row">

@@ -130,10 +130,9 @@ export function prepareMorph(lmA, lmB, w, h) {
  * @param {{ ptsA, ptsB, triangles }} morphData  from prepareMorph()
  * @param {number} t  interpolation 0 = 100% A, 1 = 100% B
  */
-// Draw an image scaled to cover the canvas (object-fit: cover) at alpha.
-function drawCover(ctx, img, alpha, w, h) {
-  if (alpha <= 0) return;
-  ctx.globalAlpha = alpha;
+// Draw an image scaled to cover the canvas (object-fit: cover) at the
+// currently active globalAlpha. Caller is responsible for setting alpha.
+function drawCover(ctx, img, w, h) {
   const iw = img.naturalWidth || img.width;
   const ih = img.naturalHeight || img.height;
   if (!iw || !ih) return;
@@ -160,10 +159,17 @@ export function renderMorphFrame(ctx, imgA, imgB, morphData, t) {
 
   ctx.clearRect(0, 0, w, h);
 
-  // Backdrop: cross-fade both source images at cover-fit so the area
-  // outside the face triangles never shows the bare black canvas.
-  drawCover(ctx, imgA, 1 - t, w, h);
-  drawCover(ctx, imgB, t,     w, h);
+  // Backdrop: opaque user image as the always-visible base, then celeb
+  // crossfaded on top with `t` alpha. This produces a clean 0→1 transition
+  // (pure user at t=0, blend mid-way, pure celeb at t=1) and ensures the
+  // area outside the face triangles never shows bare black canvas.
+  ctx.globalAlpha = 1;
+  drawCover(ctx, imgA, w, h);
+  if (t > 0) {
+    ctx.globalAlpha = t;
+    drawCover(ctx, imgB, w, h);
+  }
+  ctx.globalAlpha = 1;
 
   // Foreground: warped face triangles paint over the backdrop with the
   // proper morph geometry.
@@ -183,18 +189,20 @@ export function renderMorphFrame(ctx, imgA, imgB, morphData, t) {
 }
 
 /**
- * Simple cross-fade fallback (no warping, just opacity blend).
+ * Simple cross-fade fallback (no warping). Uses the same opaque-backdrop
+ * approach as renderMorphFrame so the user image stays visible at every
+ * slider position instead of being washed out by alpha-stacking.
  */
 export function renderCrossFade(ctx, imgA, imgB, t) {
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
   ctx.clearRect(0, 0, w, h);
 
-  ctx.globalAlpha = 1 - t;
-  ctx.drawImage(imgA, 0, 0, w, h);
-
-  ctx.globalAlpha = t;
-  ctx.drawImage(imgB, 0, 0, w, h);
-
+  ctx.globalAlpha = 1;
+  drawCover(ctx, imgA, w, h);
+  if (t > 0) {
+    ctx.globalAlpha = t;
+    drawCover(ctx, imgB, w, h);
+  }
   ctx.globalAlpha = 1;
 }
