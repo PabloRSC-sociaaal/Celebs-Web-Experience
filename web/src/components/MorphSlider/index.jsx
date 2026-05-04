@@ -24,7 +24,9 @@ export function MorphSlider({ userPhoto, celebPhoto, color }) {
   const canvasRef    = useRef(null);
   const containerRef = useRef(null);
 
-  const [sliderT, setSliderT]     = useState(0);
+  // Start mostly on the celeb side so the photo on screen matches the
+  // page header immediately. The user can drag back to see themselves.
+  const [sliderT, setSliderT]     = useState(0.65);
   const [dragging, setDragging]   = useState(false);
   const [loading, setLoading]     = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
