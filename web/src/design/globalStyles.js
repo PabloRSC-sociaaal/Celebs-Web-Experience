@@ -30,6 +30,16 @@ export const globalCSS = `
     50%     { box-shadow: 4px 4px 0 ${colors.black}, 0 0 0 12px ${colors.yellow}00; transform: scale(1.02); }
   }
 
+  /* ── Hero celebrity silhouettes — decorative, scan-on-loop ── */
+  @keyframes celebEnterL  { from { opacity: 0; transform: translateX(-60px) rotate(-6deg) scale(0.92); } to { opacity: var(--celeb-op, 0.95); transform: translateX(0) rotate(-3deg) scale(1); } }
+  @keyframes celebEnterR  { from { opacity: 0; transform: translateX(60px)  rotate(6deg)  scale(0.92); } to { opacity: var(--celeb-op, 0.95); transform: translateX(0) rotate(2deg)  scale(1); } }
+  @keyframes celebEnterT  { from { opacity: 0; transform: translateY(-50px) rotate(3deg)  scale(0.95); } to { opacity: var(--celeb-op, 0.95); transform: translateY(0) rotate(-2deg) scale(1); } }
+  @keyframes celebFloatL  { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-12px) rotate(-1.5deg); } }
+  @keyframes celebFloatR  { 0%,100% { transform: translateY(0) rotate(2deg); }  50% { transform: translateY(-14px) rotate(3.5deg); } }
+  @keyframes celebFloatT  { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-10px) rotate(-3deg); } }
+  @keyframes celebScanV   { 0%,15% { top: -8%; opacity: 0; } 25% { opacity: 0.9; } 75% { opacity: 0.9; } 85%,100% { top: 108%; opacity: 0; } }
+  @keyframes celebMatchPulse { 0%,100% { filter: drop-shadow(0 8px 20px rgba(0,0,0,0.35)); } 50% { filter: drop-shadow(0 8px 20px rgba(0,0,0,0.35)) drop-shadow(0 0 24px ${colors.yellow}88); } }
+
   .halftone       { background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px); background-size: 16px 16px; }
   .halftone-light { background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px); background-size: 18px 18px; }
   .glow-text {
@@ -43,6 +53,11 @@ export const globalCSS = `
   .review-card:hover { border-color: ${colors.yellow} !important; transform: scale(1.03) !important; }
   .use-card:hover    { transform: rotate(-1deg) scale(1.04) !important; }
   .cta-main          { animation: ctaPulse 2.4s ease-in-out infinite !important; }
+
+  /* ── Hide hero celebs below 1100px (not enough room for them not to overlap) ── */
+  @media (max-width: 1100px) {
+    .hero-celeb { display: none !important; }
+  }
 
   /* ── 860 px and below (tablet portrait + mobile) ── */
   @media (max-width: 860px) {

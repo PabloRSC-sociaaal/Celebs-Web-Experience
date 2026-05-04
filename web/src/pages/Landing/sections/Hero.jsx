@@ -5,6 +5,51 @@ import { HeroUpload }    from "../../../components/HeroUpload";
 import { Stars }         from "../../../components/Stars";
 import { Marquee }       from "../../../components/Marquee";
 
+// ── Decorative celebrity silhouette w/ entry, idle float and AI-scan loop ──
+function HeroCeleb({ src, side = "left", style, enterDelay = 0, floatDelay = 0, scanDelay = 0 }) {
+  const enterAnim = side === "left" ? "celebEnterL" : side === "right" ? "celebEnterR" : "celebEnterT";
+  const floatAnim = side === "left" ? "celebFloatL" : side === "right" ? "celebFloatR" : "celebFloatT";
+  return (
+    <div
+      className="hero-celeb"
+      style={{
+        position: "absolute",
+        pointerEvents: "none",
+        zIndex: 1,
+        opacity: 0,
+        animation: `${enterAnim} 0.9s cubic-bezier(0.34,1.56,0.64,1) ${enterDelay}s forwards, ${floatAnim} 6s ease-in-out ${0.9 + enterDelay + floatDelay}s infinite, celebMatchPulse 8s ease-in-out ${1 + enterDelay + scanDelay}s infinite`,
+        ...style,
+      }}
+    >
+      <div style={{ position: "relative", height: "100%", width: "auto" }}>
+        <img
+          src={src}
+          alt=""
+          draggable={false}
+          style={{
+            height: "100%", width: "auto",
+            display: "block",
+            filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.45))",
+            userSelect: "none",
+          }}
+        />
+        {/* AI scan line — sweeps vertically over the celebrity face */}
+        <div
+          style={{
+            position: "absolute", left: 0, right: 0,
+            height: 14,
+            background: `linear-gradient(180deg, transparent, ${colors.yellow}aa 45%, ${colors.yellow} 50%, ${colors.yellow}aa 55%, transparent)`,
+            filter: "blur(2px)",
+            mixBlendMode: "screen",
+            opacity: 0,
+            animation: `celebScanV 6s ease-in-out ${1 + enterDelay + scanDelay}s infinite`,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function HeroSection() {
   const navigate       = useNavigate();
   const setPhoto       = useAppStore(s => s.setUploadedPhoto);
@@ -35,9 +80,36 @@ export function HeroSection() {
       <div style={{ position: "absolute", top: 60, left: "-5%", width: 350, height: 350, borderRadius: "50%", background: `radial-gradient(circle, ${colors.yellow}12, transparent 65%)`, filter: "blur(50px)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: 40, right: "-5%", width: 250, height: 250, borderRadius: "50%", background: `radial-gradient(circle, ${colors.pink}10, transparent 65%)`, filter: "blur(40px)", pointerEvents: "none" }} />
 
+      {/* ── Decorative celebrity silhouettes (desktop only) ── */}
+      <HeroCeleb
+        src="/samples/hero/billie.png"
+        side="left"
+        style={{ left: "-40px", bottom: "70px", height: "min(64vh, 520px)", "--celeb-op": 0.95 }}
+        enterDelay={0.15}
+        floatDelay={0}
+        scanDelay={1.2}
+      />
+      <HeroCeleb
+        src="/samples/hero/chalamet.png"
+        side="top"
+        style={{ right: "-30px", top: "60px", height: "min(60vh, 480px)", "--celeb-op": 0.93 }}
+        enterDelay={0.35}
+        floatDelay={1.3}
+        scanDelay={3.0}
+      />
+      <HeroCeleb
+        src="/samples/hero/sabrina.png"
+        side="right"
+        style={{ right: "-50px", bottom: "100px", height: "min(56vh, 460px)", "--celeb-op": 0.92 }}
+        enterDelay={0.55}
+        floatDelay={2.2}
+        scanDelay={5.0}
+      />
+
       <div className="hero-grid" style={{
         maxWidth: 1140, width: "100%", margin: "0 auto",
         display: "flex", gap: 48, alignItems: "center",
+        position: "relative", zIndex: 3,
       }}>
         {/* ── Left column: text ── */}
         <div className="hero-left" style={{
