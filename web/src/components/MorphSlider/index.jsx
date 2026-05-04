@@ -27,9 +27,12 @@ export function MorphSlider({ userPhoto, celebPhoto, color }) {
   const [sliderT, setSliderT]     = useState(0);
   const [dragging, setDragging]   = useState(false);
   const [loading, setLoading]     = useState(true);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [hinting, setHinting]     = useState(false);
 
   const morphRef = useRef(null);
   const imgsRef  = useRef({ a: null, b: null });
+  const hintRef  = useRef(null);
 
   // ── Load images & detect landmarks on mount ──
   useEffect(() => {
@@ -91,10 +94,57 @@ export function MorphSlider({ userPhoto, celebPhoto, color }) {
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const t = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     setSliderT(t);
-  }, []);
+    if (!hasInteracted) setHasInteracted(true);
+  }, [hasInteracted]);
+
+  // ── Idle auto-hint: nudge the slider every few seconds until first drag ──
+  useEffect(() => {
+    if (loading || hasInteracted) return;
+    let cancelled = false;
+
+    const sequence = async () => {
+      // Smooth in-out tween to a target slider position (no setInterval bursts).
+      const tweenTo = (target, ms) => new Promise(resolve => {
+        const startT = sliderT;
+        const startMs = performance.now();
+        const step = (now) => {
+          if (cancelled || hasInteracted) return resolve();
+          const k = Math.min(1, (now - startMs) / ms);
+          const eased = k < 0.5 ? 2 * k * k : -1 + (4 - 2 * k) * k;
+          setSliderT(startT + (target - startT) * eased);
+          if (k < 1) requestAnimationFrame(step);
+          else resolve();
+        };
+        requestAnimationFrame(step);
+      });
+
+      // Wait first, then loop the nudge while user is idle.
+      await new Promise(r => { hintRef.current = setTimeout(r, 2200); });
+      while (!cancelled && !hasInteracted) {
+        setHinting(true);
+        await tweenTo(0.55, 900);
+        if (cancelled || hasInteracted) break;
+        await tweenTo(0.15, 900);
+        if (cancelled || hasInteracted) break;
+        await tweenTo(0.4,  600);
+        setHinting(false);
+        await new Promise(r => { hintRef.current = setTimeout(r, 3500); });
+      }
+      setHinting(false);
+    };
+
+    sequence();
+    return () => {
+      cancelled = true;
+      if (hintRef.current) clearTimeout(hintRef.current);
+    };
+    // intentionally exclude sliderT — we only want to start the loop once
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, hasInteracted]);
 
   useEffect(() => {
     if (!dragging) return;
+    if (!hasInteracted) setHasInteracted(true);
     const move = (e) => handleMove(e);
     const up   = () => setDragging(false);
     window.addEventListener("mousemove", move);
@@ -186,6 +236,7 @@ export function MorphSlider({ userPhoto, celebPhoto, color }) {
               cursor: "col-resize", zIndex: 20,
               boxShadow: `0 0 20px ${color}88`,
               transition: dragging ? "none" : "left 0.05s",
+              animation: !hasInteracted && !dragging ? "morphHintRingP 1.6s ease-in-out infinite" : "none",
             }}
           >
             <svg width={20} height={14} viewBox="0 0 20 14">
@@ -220,14 +271,21 @@ export function MorphSlider({ userPhoto, celebPhoto, color }) {
         }}>CELEB</div>
       </div>
 
-      <style>{`@keyframes morphSpin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes morphSpin       { to { transform: rotate(360deg); } }
+        @keyframes morphHintPulse  { 0%,100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 1; transform: scale(1.04); } }
+        @keyframes morphHintRingP  { 0%,100% { box-shadow: 0 0 20px ${color}88, 0 0 0 0 ${color}66; } 50% { box-shadow: 0 0 24px ${color}aa, 0 0 0 14px ${color}00; } }
+      `}</style>
 
       <div style={{
-        textAlign: "center", marginTop: 8,
-        fontFamily: "'Oxanium'", fontSize: 10,
-        color: "rgba(255,255,255,0.28)",
+        textAlign: "center", marginTop: 10,
+        fontFamily: "'Oxanium'", fontSize: 11, fontWeight: 700,
+        color: hinting ? color : "rgba(255,255,255,0.42)",
+        letterSpacing: 0.8, textTransform: "uppercase",
+        animation: !hasInteracted ? "morphHintPulse 1.6s ease-in-out infinite" : "none",
+        transition: "color 0.3s",
       }}>
-        ← drag to morph →
+        ← Drag to morph →
       </div>
     </div>
   );

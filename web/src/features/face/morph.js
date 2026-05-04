@@ -130,6 +130,24 @@ export function prepareMorph(lmA, lmB, w, h) {
  * @param {{ ptsA, ptsB, triangles }} morphData  from prepareMorph()
  * @param {number} t  interpolation 0 = 100% A, 1 = 100% B
  */
+// Draw an image scaled to cover the canvas (object-fit: cover) at alpha.
+function drawCover(ctx, img, alpha, w, h) {
+  if (alpha <= 0) return;
+  ctx.globalAlpha = alpha;
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  if (!iw || !ih) return;
+  const sAr = iw / ih;
+  const cAr = w / h;
+  let dw, dh, dx, dy;
+  if (sAr > cAr) {
+    dh = h; dw = h * sAr; dx = (w - dw) / 2; dy = 0;
+  } else {
+    dw = w; dh = w / sAr; dx = 0; dy = (h - dh) / 2;
+  }
+  ctx.drawImage(img, dx, dy, dw, dh);
+}
+
 export function renderMorphFrame(ctx, imgA, imgB, morphData, t) {
   const { ptsA, ptsB, triangles } = morphData;
   const w = ctx.canvas.width;
@@ -142,6 +160,13 @@ export function renderMorphFrame(ctx, imgA, imgB, morphData, t) {
 
   ctx.clearRect(0, 0, w, h);
 
+  // Backdrop: cross-fade both source images at cover-fit so the area
+  // outside the face triangles never shows the bare black canvas.
+  drawCover(ctx, imgA, 1 - t, w, h);
+  drawCover(ctx, imgB, t,     w, h);
+
+  // Foreground: warped face triangles paint over the backdrop with the
+  // proper morph geometry.
   for (const [i0, i1, i2] of triangles) {
     const dstTri = [ptsMid[i0], ptsMid[i1], ptsMid[i2]];
     const triA   = [ptsA[i0],   ptsA[i1],   ptsA[i2]];

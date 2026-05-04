@@ -342,12 +342,13 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
 
   // Viewer-level lock: depends on the currently active match index.
   // Unregistered users can only see the last match (freeIdx) freely.
-  const needsAuth    = !user && !preloaded && activeIdx !== freeIdx;
-  const needsPremium = (pct) => user && !premium && !preloaded && pct >= 90;
+  // Premium gating applies regardless of how the result is reached
+  // (fresh scan or saved generation) — saving never grants premium access.
+  const needsAuth    = !user && activeIdx !== freeIdx;
+  const needsPremium = (pct) => user && !premium && pct >= 90;
 
   // Card-level lock for the "Also looks like" row.
   const isLocked = (pct, originalIndex) => {
-    if (preloaded) return false;
     if (!user) return originalIndex !== freeIdx;
     if (!premium && pct >= 90) return true;
     return false;
