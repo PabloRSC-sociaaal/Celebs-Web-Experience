@@ -159,24 +159,15 @@ export async function generateShareCard({ celeb, userPhotoUrl }) {
   const userX   = cardX + padding;
   const celebX  = userX + photoW + padding;
 
-  // ── 4a. User photo (blurred) ──
+  // ── 4a. User photo (clear — it's their own photo) ──
   try {
     const userImg = await loadImg(userPhotoUrl);
     ctx.save();
     roundRect(ctx, userX, photoY, photoW, photoH, 24);
     ctx.clip();
-    ctx.filter = "blur(40px) saturate(0.7) brightness(0.75)";
-    drawCoverIntoRect(ctx, userImg, userX - 30, photoY - 30, photoW + 60, photoH + 60);
-    ctx.filter = "none";
-    // Dark scrim
-    const sc = ctx.createLinearGradient(userX, photoY, userX, photoY + photoH);
-    sc.addColorStop(0, "rgba(0,0,0,0.15)");
-    sc.addColorStop(1, "rgba(0,0,0,0.55)");
-    ctx.fillStyle = sc;
-    ctx.fillRect(userX, photoY, photoW, photoH);
+    drawCoverIntoRect(ctx, userImg, userX, photoY, photoW, photoH);
     ctx.restore();
   } catch {
-    // Fallback solid block
     ctx.save();
     roundRect(ctx, userX, photoY, photoW, photoH, 24);
     ctx.clip();
@@ -184,37 +175,6 @@ export async function generateShareCard({ celeb, userPhotoUrl }) {
     ctx.fillRect(userX, photoY, photoW, photoH);
     ctx.restore();
   }
-
-  // Lock icon + "Privacy first"
-  const lockCx = userX + photoW / 2;
-  const lockCy = photoY + photoH / 2 - 30;
-  ctx.fillStyle = "rgba(255,229,0,0.18)";
-  ctx.beginPath();
-  ctx.arc(lockCx, lockCy, 56, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = C.yellow + "cc";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.arc(lockCx, lockCy, 56, 0, Math.PI * 2);
-  ctx.stroke();
-
-  // Lock svg drawn manually (rect + arc)
-  ctx.strokeStyle = C.yellow;
-  ctx.lineWidth = 5.5;
-  ctx.lineCap   = "round";
-  ctx.lineJoin  = "round";
-  // Body
-  ctx.beginPath();
-  ctx.rect(lockCx - 22, lockCy - 8, 44, 30);
-  ctx.stroke();
-  // Shackle
-  ctx.beginPath();
-  ctx.arc(lockCx, lockCy - 8, 14, Math.PI, 0);
-  ctx.stroke();
-
-  ctx.fillStyle = C.yellow;
-  ctx.font = "800 26px 'Oxanium', sans-serif";
-  ctx.fillText("PRIVACY FIRST", lockCx, lockCy + 90);
 
   // YOU tag bottom-left
   ctx.fillStyle = "rgba(0,0,0,0.78)";
@@ -225,13 +185,21 @@ export async function generateShareCard({ celeb, userPhotoUrl }) {
   ctx.textAlign = "center";
   ctx.fillText("YOU", userX + 16 + 43, photoY + photoH - 26);
 
-  // ── 4b. Celeb photo (clear) ──
+  // ── 4b. Celeb photo (blurred + locked — the reward, gated by sign-up) ──
   try {
     const celebImg = await loadImg(celeb.img);
     ctx.save();
     roundRect(ctx, celebX, photoY, photoW, photoH, 24);
     ctx.clip();
-    drawCoverIntoRect(ctx, celebImg, celebX, photoY, photoW, photoH);
+    ctx.filter = "blur(36px) saturate(0.6) brightness(0.55)";
+    drawCoverIntoRect(ctx, celebImg, celebX - 30, photoY - 30, photoW + 60, photoH + 60);
+    ctx.filter = "none";
+    // Dark scrim for readability of the lock UI
+    const sc = ctx.createLinearGradient(celebX, photoY, celebX, photoY + photoH);
+    sc.addColorStop(0, "rgba(0,0,0,0.25)");
+    sc.addColorStop(1, "rgba(0,0,0,0.65)");
+    ctx.fillStyle = sc;
+    ctx.fillRect(celebX, photoY, photoW, photoH);
     ctx.restore();
   } catch {
     ctx.save();
@@ -242,16 +210,47 @@ export async function generateShareCard({ celeb, userPhotoUrl }) {
     ctx.restore();
   }
 
-  // Celeb tag bottom-right
-  const celebTagText = (celeb.name || "CELEB").toUpperCase().split(" ")[0];
-  ctx.font = "800 18px 'Oxanium', sans-serif";
-  const tagW = Math.max(86, ctx.measureText(celebTagText).width + 22);
+  // Lock icon + "TAP TO REVEAL" inside the celeb cell
+  const lockCx = celebX + photoW / 2;
+  const lockCy = photoY + photoH / 2 - 30;
+  ctx.fillStyle = "rgba(255,229,0,0.22)";
+  ctx.beginPath();
+  ctx.arc(lockCx, lockCy, 60, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = C.yellow + "dd";
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  ctx.arc(lockCx, lockCy, 60, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.strokeStyle = C.yellow;
+  ctx.lineWidth = 5.5;
+  ctx.lineCap   = "round";
+  ctx.lineJoin  = "round";
+  ctx.beginPath();
+  ctx.rect(lockCx - 22, lockCy - 8, 44, 30);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(lockCx, lockCy - 8, 14, Math.PI, 0);
+  ctx.stroke();
+
+  ctx.fillStyle = C.yellow;
+  ctx.font = "800 22px 'Oxanium', sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("TAP TO REVEAL", lockCx, lockCy + 96);
+  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  ctx.font = "700 16px 'Oxanium', sans-serif";
+  ctx.fillText("celebs.app", lockCx, lockCy + 124);
+
+  // CELEB tag bottom-right
   ctx.fillStyle = celeb.color || C.yellow;
+  ctx.font = "800 18px 'Oxanium', sans-serif";
+  const tagW = 86;
   roundRect(ctx, celebX + photoW - tagW - 16, photoY + photoH - 50, tagW, 34, 8);
   ctx.fill();
   ctx.fillStyle = (celeb.color === C.yellow || !celeb.color) ? C.black : C.white;
   ctx.textAlign = "center";
-  ctx.fillText(celebTagText, celebX + photoW - tagW - 16 + tagW / 2, photoY + photoH - 26);
+  ctx.fillText("CELEB", celebX + photoW - tagW - 16 + tagW / 2, photoY + photoH - 26);
 
   // ── 5. Center match badge — overlapping the gap between photos ──
   const badgeCx = cardX + cardW / 2;
@@ -282,15 +281,15 @@ export async function generateShareCard({ celeb, userPhotoUrl }) {
   ctx.textBaseline = "middle";
   ctx.fillText(`${celeb.pct}%`, badgeCx, badgeCy + 4);
 
-  // ── 6. Celeb name below photos ──
+  // ── 6. Mystery teaser below photos (celeb identity is the reveal) ──
   const nameY = photoY + photoH + 78;
   ctx.fillStyle = C.white;
-  ctx.font = "700 64px 'Fredoka', sans-serif";
+  ctx.font = "700 56px 'Fredoka', sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "alphabetic";
-  ctx.fillText(celeb.name || "Celebrity", W / 2, nameY);
+  ctx.fillText("?  ?  ?  ?  ?", W / 2, nameY);
 
-  // Doppelganger pill if pct >= 90
+  // Doppelganger pill if pct >= 90 — keeps the FOMO without spoiling identity
   if (celeb.pct >= 90) {
     const pillTxt = "🔥 DOPPELGANGER";
     ctx.font = "800 24px 'Oxanium', sans-serif";

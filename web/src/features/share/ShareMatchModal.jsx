@@ -83,9 +83,10 @@ export function ShareMatchModal({ open, onClose, celeb, userPhotoUrl, userName =
   if (!open) return null;
 
   // ── Action handlers ──
+  // Caption hides the celeb identity — that's the reveal at the link.
   const shareCaption = celeb.pct >= 90
-    ? `🔥 I'm a ${celeb.pct}% match with ${celeb.name}! Could you be next? 👀`
-    : `${celeb.pct}% match with ${celeb.name} 😅 Find your celebrity Doppelganger →`;
+    ? `🔥 ${celeb.pct}% match with my celebrity Doppelganger… can you guess who? 👀`
+    : `Just got a ${celeb.pct}% celebrity match 😅 Tap to see who and find yours →`;
 
   const handleNativeShare = async () => {
     if (!blob || !shareUrl) return;

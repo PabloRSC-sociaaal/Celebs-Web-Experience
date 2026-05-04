@@ -54,8 +54,10 @@ export const globalCSS = `
   .use-card:hover    { transform: rotate(-1deg) scale(1.04) !important; }
   .cta-main          { animation: ctaPulse 2.4s ease-in-out infinite !important; }
 
-  /* ── Hide hero celebs below 1100px (not enough room for them not to overlap) ── */
-  @media (max-width: 1100px) {
+  /* ── Hero celebs only on very wide screens. The hero-grid is max 1140px,
+       so we need ≥1700px to have ~280px of breathing room on each side
+       before the silhouettes start overlapping the text / upload widget. ── */
+  @media (max-width: 1700px) {
     .hero-celeb { display: none !important; }
   }
 

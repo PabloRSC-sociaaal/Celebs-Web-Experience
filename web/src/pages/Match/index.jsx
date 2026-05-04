@@ -13,6 +13,8 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getMatchShare } from "../../services/matchShare";
 import { useCtaUpload } from "../../hooks/useCtaUpload";
+import { useAppStore } from "../../store/appStore";
+import { isPremium } from "../../features/firebase/subscriptionService";
 
 const C = {
   blue: "#2AABE2", yellow: "#FFE500", black: "#0A0A0A", white: "#FFFFFF",
@@ -25,6 +27,14 @@ export function MatchPage() {
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(true);
   const { triggerUpload, inputProps } = useCtaUpload();
+
+  // Viewer-state gates the celeb reveal:
+  //   - not registered  → celeb hidden (sign up to reveal)
+  //   - registered free → celeb shown unless it's a Doppelganger (≥90 %)
+  //   - premium         → always shown
+  const user         = useAppStore(s => s.user);
+  const subscription = useAppStore(s => s.subscription);
+  const premium      = isPremium(subscription);
 
   useEffect(() => {
     const m = getMatchShare(matchId);
@@ -59,6 +69,10 @@ export function MatchPage() {
 
   const { celeb, userPhotoThumb, senderName } = match;
   const isDoppelganger = celeb.pct >= 90;
+  // Celeb reveal rules: anonymous viewers always gated; logged-in free users
+  // gated only on Doppelganger-tier matches; premium always sees everything.
+  const celebHidden = !user || (!premium && isDoppelganger);
+  const celebGateReason = !user ? "register" : "premium";
 
   return (
     <Shell>
@@ -123,12 +137,12 @@ export function MatchPage() {
             display: "grid", gridTemplateColumns: "1fr 1fr",
             gap: 10, position: "relative",
           }}>
-            {/* User (blurred) */}
+            {/* User photo — always shown (it's their own photo, no privacy issue) */}
             <div style={{
               position: "relative", aspectRatio: "3/4",
               borderRadius: 14, overflow: "hidden",
               background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              border: "1px solid rgba(255,255,255,0.18)",
             }}>
               <img
                 src={userPhotoThumb}
@@ -138,32 +152,8 @@ export function MatchPage() {
                   position: "absolute", inset: 0,
                   width: "100%", height: "100%",
                   objectFit: "cover", objectPosition: "center top",
-                  filter: "blur(28px) saturate(0.7) brightness(0.85)",
-                  transform: "scale(1.2)",
                 }}
               />
-              <div style={{
-                position: "absolute", inset: 0,
-                background: "linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.5))",
-                display: "flex", flexDirection: "column",
-                alignItems: "center", justifyContent: "center", gap: 8,
-              }}>
-                <div style={{
-                  width: 42, height: 42, borderRadius: "50%",
-                  background: `${C.yellow}22`, border: `1.5px solid ${C.yellow}88`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                    stroke={C.yellow} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="4" y="11" width="16" height="10" rx="2" />
-                    <path d="M8 11V8a4 4 0 1 1 8 0v3" />
-                  </svg>
-                </div>
-                <span style={{
-                  fontFamily: "'Oxanium'", fontSize: 9, fontWeight: 800,
-                  color: C.yellow, textTransform: "uppercase", letterSpacing: 1.2,
-                }}>Privacy first</span>
-              </div>
               <span style={{
                 position: "absolute", bottom: 8, left: 8,
                 background: "rgba(0,0,0,0.72)", color: "#fff",
@@ -192,12 +182,12 @@ export function MatchPage() {
               </div>
             </div>
 
-            {/* Celeb (clear) */}
+            {/* Celeb — gated unless user is registered (and premium for ≥90 %) */}
             <div style={{
               position: "relative", aspectRatio: "3/4",
               borderRadius: 14, overflow: "hidden",
               background: "rgba(255,255,255,0.04)",
-              border: `1px solid ${celeb.color}66`,
+              border: `1px solid ${celebHidden ? C.yellow : celeb.color}66`,
             }}>
               <img
                 src={celeb.img} alt={celeb.name}
@@ -206,26 +196,60 @@ export function MatchPage() {
                   position: "absolute", inset: 0,
                   width: "100%", height: "100%",
                   objectFit: "cover", objectPosition: "center top",
+                  filter: celebHidden ? "blur(30px) saturate(0.6) brightness(0.55)" : "none",
+                  transform: celebHidden ? "scale(1.2)" : "none",
                 }}
               />
+              {celebHidden && (
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: "linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0.7))",
+                  display: "flex", flexDirection: "column",
+                  alignItems: "center", justifyContent: "center", gap: 8, padding: 10, textAlign: "center",
+                }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: "50%",
+                    background: `${C.yellow}22`, border: `1.5px solid ${C.yellow}aa`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                      stroke={C.yellow} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="4" y="11" width="16" height="10" rx="2" />
+                      <path d="M8 11V8a4 4 0 1 1 8 0v3" />
+                    </svg>
+                  </div>
+                  <span style={{
+                    fontFamily: "'Oxanium'", fontSize: 10, fontWeight: 800,
+                    color: C.yellow, textTransform: "uppercase", letterSpacing: 1.4,
+                    lineHeight: 1.3,
+                  }}>
+                    {celebGateReason === "register" ? "Sign up to reveal" : "Premium reveals"}
+                  </span>
+                </div>
+              )}
               <span style={{
                 position: "absolute", bottom: 8, right: 8,
-                background: celeb.color, color: celeb.color === C.yellow ? C.black : "#fff",
+                background: celebHidden ? "rgba(0,0,0,0.72)" : celeb.color,
+                color: celebHidden
+                  ? C.yellow
+                  : (celeb.color === C.yellow ? C.black : "#fff"),
                 fontFamily: "'Oxanium'", fontSize: 9, fontWeight: 800,
                 padding: "3px 8px", borderRadius: 6,
                 textTransform: "uppercase", letterSpacing: 1,
-              }}>{celeb.name.split(" ")[0]}</span>
+              }}>
+                {celebHidden ? "?????" : celeb.name.split(" ")[0]}
+              </span>
             </div>
           </div>
 
-          {/* Celeb name */}
+          {/* Celeb name — hidden under reveal CTA when gated */}
           <div style={{ textAlign: "center", marginTop: 14 }}>
             <h2 style={{
               fontFamily: "'Fredoka'", fontSize: 24, fontWeight: 700,
-              color: C.white, margin: 0, letterSpacing: 0.3,
+              color: C.white, margin: 0, letterSpacing: celebHidden ? 6 : 0.3,
               lineHeight: 1.05,
             }}>
-              {celeb.name}
+              {celebHidden ? "?  ?  ?  ?  ?" : celeb.name}
             </h2>
             {isDoppelganger && (
               <div style={{
@@ -259,16 +283,29 @@ export function MatchPage() {
           </div>
         </div>
 
-        {/* ── Hook ── */}
+        {/* ── Hook (varies by viewer state) ── */}
         <div style={{ textAlign: "center", maxWidth: 360, marginTop: 4 }}>
           <p style={{
             fontFamily: "'Oxanium'", fontSize: 14, fontWeight: 600,
             color: C.white, margin: 0, lineHeight: 1.45,
           }}>
-            Could <span style={{ color: C.yellow, fontWeight: 800 }}>YOU</span> be next?<br />
-            <span style={{ color: "rgba(255,255,255,0.55)", fontWeight: 500, fontSize: 12 }}>
-              Upload a selfie. Our AI scans 50,000+ celebrities. Free.
-            </span>
+            {celebHidden ? (
+              <>
+                Want to see <span style={{ color: C.yellow, fontWeight: 800 }}>who they look like</span>?<br />
+                <span style={{ color: "rgba(255,255,255,0.55)", fontWeight: 500, fontSize: 12 }}>
+                  {celebGateReason === "register"
+                    ? "Sign up free — and find your own match too."
+                    : "Go Premium to reveal Doppelganger-tier matches."}
+                </span>
+              </>
+            ) : (
+              <>
+                Could <span style={{ color: C.yellow, fontWeight: 800 }}>YOU</span> be next?<br />
+                <span style={{ color: "rgba(255,255,255,0.55)", fontWeight: 500, fontSize: 12 }}>
+                  Upload a selfie. Our AI scans 50,000+ celebrities. Free.
+                </span>
+              </>
+            )}
           </p>
         </div>
 
