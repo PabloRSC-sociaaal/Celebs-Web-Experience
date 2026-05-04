@@ -5,6 +5,7 @@ import { useAppStore } from "./store/appStore";
 import { FirebaseTestPanel } from "./features/firebase/testPanel";
 import { MorphBoomerang } from "./components/MorphBoomerang";
 import { signOutUser } from "./features/firebase/authService";
+import { isPremium } from "./features/firebase/subscriptionService";
 import { AuthModal } from "./features/auth/AuthModal";
 import { getFlag } from "./config";
 import {
@@ -1892,6 +1893,13 @@ function GenCard({ gen, onView, onLabelUpdate }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [subOf, setSubOf]           = useState(null);
 
+  // ── Premium gating: any Doppelganger-tier match (≥90%) stays locked
+  // until the user goes Premium. Blurred preview + reveal CTA.
+  const subscription = useAppStore(s => s.subscription);
+  const premium      = isPremium(subscription);
+  const pct          = gen.celeb?.pct ?? 0;
+  const locked       = !premium && pct >= 90;
+
   const current = getLabelInfo(labelState.label, labelState.sub);
 
   const pick = (lId, sId = null) => {
@@ -1917,24 +1925,75 @@ function GenCard({ gen, onView, onLabelUpdate }) {
       {/* ── Photo area with morph boomerang ── */}
       <div style={{ position:"relative", aspectRatio:"1/1", overflow:"hidden", cursor:"pointer" }}
         onClick={() => onView(gen)}>
-        {gen.thumb && gen.celeb?.img ? (
-          <MorphBoomerang
-            userPhoto={gen.preview || gen.thumb}
-            celebPhoto={gen.celeb.img}
-          />
-        ) : gen.thumb ? (
-          <img src={gen.thumb} alt="your photo"
-            style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center center", display:"block" }} />
-        ) : (
-          <div style={{ width:"100%", height:"100%", background:"#1a1a2e", display:"flex", alignItems:"center", justifyContent:"center", fontSize:40 }}>👤</div>
-        )}
+        <div style={{
+          width:"100%", height:"100%",
+          filter: locked ? "blur(22px) saturate(0.7) brightness(0.65)" : "none",
+          transform: locked ? "scale(1.12)" : "none",
+          transition: "filter 0.3s",
+        }}>
+          {gen.thumb && gen.celeb?.img ? (
+            <MorphBoomerang
+              userPhoto={gen.preview || gen.thumb}
+              celebPhoto={gen.celeb.img}
+            />
+          ) : gen.thumb ? (
+            <img src={gen.thumb} alt="your photo"
+              style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center center", display:"block" }} />
+          ) : (
+            <div style={{ width:"100%", height:"100%", background:"#1a1a2e", display:"flex", alignItems:"center", justifyContent:"center", fontSize:40 }}>👤</div>
+          )}
+        </div>
 
         {/* Gradient overlay */}
         <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 52%)" }} />
 
+        {/* ── Premium lock overlay (only when locked) ── */}
+        {locked && (
+          <div style={{
+            position:"absolute", inset:0, zIndex:3,
+            display:"flex", flexDirection:"column",
+            alignItems:"center", justifyContent:"center",
+            gap:8, padding:14, textAlign:"center",
+            background: `radial-gradient(circle at center, rgba(0,0,0,0.45), rgba(0,0,0,0.78))`,
+          }}>
+            <div style={{
+              width:48, height:48, borderRadius:"50%",
+              background:`${C.yellow}22`,
+              border:`1.5px solid ${C.yellow}88`,
+              display:"flex", alignItems:"center", justifyContent:"center",
+              boxShadow:`0 0 28px ${C.yellow}33`,
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke={C.yellow} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="4" y="11" width="16" height="10" rx="2" />
+                <path d="M8 11V8a4 4 0 1 1 8 0v3" />
+              </svg>
+            </div>
+            <div style={{
+              fontFamily:"'Oxanium'", fontSize:9, fontWeight:800,
+              color:C.yellow, letterSpacing:1.4, textTransform:"uppercase",
+            }}>
+              Premium Exclusive
+            </div>
+            <button
+              onClick={e => { e.stopPropagation(); onView(gen); }}
+              style={{
+                background:C.yellow, color:C.black,
+                border:`2px solid ${C.black}`, borderRadius:10,
+                padding:"7px 14px", cursor:"pointer",
+                fontFamily:"'Oxanium'", fontWeight:800, fontSize:11,
+                letterSpacing:0.6, textTransform:"uppercase",
+                boxShadow:`2px 2px 0 ${C.black}`,
+                whiteSpace:"nowrap",
+              }}>
+              👑 Reveal Doppelganger
+            </button>
+          </div>
+        )}
+
         {/* % badge — top right */}
         <div style={{
-          position:"absolute", top:8, right:8,
+          position:"absolute", top:8, right:8, zIndex:4,
           background: gen.celeb?.color || C.yellow,
           color: gen.celeb?.color === C.yellow ? C.black : C.white,
           fontFamily:"'Fredoka'", fontWeight:700, fontSize:13,
@@ -1945,7 +2004,7 @@ function GenCard({ gen, onView, onLabelUpdate }) {
         {/* Label badge — top left (only if set) */}
         {current && (
           <div style={{
-            position:"absolute", top:8, left:8,
+            position:"absolute", top:8, left:8, zIndex:4,
             background:`${current.color}28`, border:`1px solid ${current.color}55`,
             borderRadius:20, padding:"2px 8px",
             fontFamily:"'Oxanium'", fontSize:10, fontWeight:700, color:current.color,
@@ -1955,13 +2014,16 @@ function GenCard({ gen, onView, onLabelUpdate }) {
           </div>
         )}
 
-        {/* Celeb name — bottom */}
-        <div style={{ position:"absolute", bottom:8, left:10, right:10 }}>
+        {/* Celeb name — bottom (hidden when locked) */}
+        <div style={{ position:"absolute", bottom:8, left:10, right:10, zIndex:4 }}>
           <div style={{ fontFamily:"'Oxanium'", fontSize:8, fontWeight:600, color:"rgba(255,255,255,0.4)", letterSpacing:1, textTransform:"uppercase" }}>
             Doppelganger
           </div>
-          <div style={{ fontFamily:"'Fredoka'", fontWeight:700, fontSize:15, color:C.white, marginTop:1 }}>
-            {gen.celeb?.name}
+          <div style={{
+            fontFamily:"'Fredoka'", fontWeight:700, fontSize:15, color:C.white, marginTop:1,
+            letterSpacing: locked ? 4 : 0,
+          }}>
+            {locked ? "?????" : gen.celeb?.name}
           </div>
         </div>
 
