@@ -4,6 +4,7 @@ import { AnalyzingPage } from "../pages/Analyzing";
 import { ResultsPage }   from "../pages/Results";
 import { DashboardPage } from "../pages/Dashboard";
 import { SharePage }     from "../pages/Share";
+import { MatchPage }     from "../pages/Match";
 import { getFlag }       from "../config";
 
 // ─────────────────────────────────────────────────────────
@@ -17,4 +18,5 @@ export const router = createBrowserRouter([
   { path: "/results",       element: <ResultsPage /> },
   { path: "/dashboard",     element: <DashboardPage /> },
   { path: "/share/:shareId", element: getFlag("VIRAL_SHARE") ? <SharePage /> : <Navigate to="/" replace /> },
+  { path: "/m/:matchId",     element: <MatchPage /> },
 ]);

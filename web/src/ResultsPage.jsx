@@ -6,6 +6,7 @@ import { useAppStore } from "./store/appStore";
 import { AuthModal } from "./features/auth/AuthModal";
 import { PaywallModal } from "./features/auth/PaywallModal";
 import { isPremium } from "./features/firebase/subscriptionService";
+import { ShareMatchModal } from "./features/share/ShareMatchModal";
 import { getFlag } from "./config";
 import { celebImg } from "./assets/manifest";
 
@@ -314,6 +315,7 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
   const subscription = useAppStore(s => s.subscription);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showShare,   setShowShare]   = useState(false);
 
   const premium = isPremium(subscription);
 
@@ -879,7 +881,29 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
               cursor: "pointer", letterSpacing: 1.1, textTransform: "uppercase",
             }}>🚀 Get My Full Analysis</button>
 
-            {/* Share row — 3 equal buttons, icons only on very small screens */}
+            {/* Viral share — opens the vertical share-card modal (Stories-ready) */}
+            {!needsPremium(celeb.pct) && (
+              <button
+                onClick={() => setShowShare(true)}
+                style={{
+                  width: "100%", padding: "clamp(13px, 2.8vw, 16px) 0",
+                  background: `linear-gradient(135deg, ${celeb.color || C.yellow}, ${C.yellow})`,
+                  color: C.black,
+                  fontFamily: "'Oxanium'", fontWeight: 800, fontSize: "clamp(13px, 3.5vw, 15px)",
+                  border: `3px solid ${C.black}`, borderRadius: 14,
+                  boxShadow: `4px 4px 0 ${C.black}, 0 0 24px ${(celeb.color || C.yellow)}66`,
+                  cursor: "pointer", letterSpacing: 1.2, textTransform: "uppercase",
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                  transition: "transform 0.15s, box-shadow 0.15s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = "translate(-2px,-2px)"; e.currentTarget.style.boxShadow = `6px 6px 0 ${C.black}, 0 0 32px ${(celeb.color || C.yellow)}88`; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = `4px 4px 0 ${C.black}, 0 0 24px ${(celeb.color || C.yellow)}66`; }}
+              >
+                📲 Share to Stories
+              </button>
+            )}
+
+            {/* Compact secondary share row — kept for fast direct posts */}
             <div className="res-share-row">
               <ShareBtn label="Share on X"  icon="𝕏"  bg="#1a1a1a"             color="#fff" onClick={() => handleShare("twitter")} />
               <ShareBtn label="WhatsApp"    icon="💬" bg="#25D366"              color="#fff" onClick={() => handleShare("whatsapp")} />
@@ -960,6 +984,15 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
     <PaywallModal
       isOpen={showPaywall}
       onClose={() => setShowPaywall(false)}
+    />
+
+    {/* Viral share — vertical 9:16 card for Snapchat / TikTok / Instagram */}
+    <ShareMatchModal
+      open={showShare}
+      onClose={() => setShowShare(false)}
+      celeb={celeb}
+      userPhotoUrl={photo}
+      userName={user?.displayName || ""}
     />
   </>);
 }
