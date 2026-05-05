@@ -32,8 +32,8 @@ const RANK_TEXT   = [C.black,  C.black,   C.white,  C.white,                  C.
 
 // ── Locked card wrapper — blur + lock overlay ────────────────────────────────
 function LockedCard({ celeb, rank, large = false, onReveal, hasUser }) {
-  const w  = large ? 150 : 120;
-  const ht = large ? 210 : 180;
+  const w  = large ? 168 : 138;
+  const ht = large ? 232 : 196;
   return (
     <div
       className={large ? "match-card match-card--large" : "match-card"}
@@ -67,35 +67,35 @@ function LockedCard({ celeb, rank, large = false, onReveal, hasUser }) {
       }} />
       {/* Rank badge — top-left */}
       <div style={{
-        position: "absolute", top: 6, left: 6, zIndex: 2,
-        background: "rgba(255,255,255,0.08)", backdropFilter: "blur(6px)",
-        color: "rgba(255,255,255,0.45)",
-        fontFamily: "'Oxanium'", fontWeight: 800, fontSize: "clamp(6px, 6%, 8px)",
-        padding: "2px 6px", borderRadius: 4, letterSpacing: 0.5, textTransform: "uppercase",
+        position: "absolute", top: 7, left: 7, zIndex: 2,
+        background: "rgba(255,255,255,0.10)", backdropFilter: "blur(6px)",
+        color: "rgba(255,255,255,0.55)",
+        fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 10,
+        padding: "3px 8px", borderRadius: 5, letterSpacing: 0.6, textTransform: "uppercase",
       }}>{RANK_LABELS[rank] || `#${rank + 1}`}</div>
       {/* Content — perfectly centered */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        gap: "clamp(4px, 4%, 8px)", padding: "12% 8%",
+        gap: 8, padding: "14px 12px",
         textAlign: "center",
       }}>
-        <div style={{ fontSize: "clamp(16px, 18%, 28px)", lineHeight: 1 }}>{hasUser ? "👑" : "🔒"}</div>
+        <div style={{ fontSize: large ? 32 : 28, lineHeight: 1 }}>{hasUser ? "👑" : "🔒"}</div>
         <div style={{
           fontFamily: "'Fredoka',sans-serif", fontWeight: 700,
-          fontSize: "clamp(9px, 10%, 14px)", color: "#fff",
+          fontSize: large ? 17 : 15, color: "#fff",
           lineHeight: 1.2,
         }}>
           {hasUser ? (celeb.pct >= 90 ? "Doppelganger" : "Lookalike") : `#${rank + 1} Match`}
         </div>
         <button onClick={(e) => { e.stopPropagation(); onReveal(); }} style={{
           background: hasUser ? C.yellow : "#fff", color: C.black, border: "none",
-          borderRadius: 7,
-          padding: "clamp(3px, 3%, 6px) clamp(8px, 8%, 14px)",
+          borderRadius: 8,
+          padding: "6px 14px",
           cursor: "pointer",
           fontFamily: "'Oxanium',sans-serif", fontWeight: 800,
-          fontSize: "clamp(7px, 7%, 11px)", letterSpacing: 0.5,
+          fontSize: 12, letterSpacing: 0.5,
           whiteSpace: "nowrap",
           boxShadow: hasUser ? `0 0 12px rgba(255,229,0,0.3)` : "0 2px 8px rgba(0,0,0,0.3)",
           transition: "transform 0.2s",
@@ -105,11 +105,11 @@ function LockedCard({ celeb, rank, large = false, onReveal, hasUser }) {
       </div>
       {/* Percentage badge — dimmed, top-right */}
       <div style={{
-        position: "absolute", top: 6, right: 6, zIndex: 2,
-        background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)",
-        color: "rgba(255,255,255,0.35)",
-        fontFamily: "'Fredoka'", fontWeight: 700, fontSize: "clamp(8px, 8%, 12px)",
-        padding: "2px 6px", borderRadius: 5,
+        position: "absolute", top: 7, right: 7, zIndex: 2,
+        background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)",
+        color: "rgba(255,255,255,0.45)",
+        fontFamily: "'Fredoka'", fontWeight: 700, fontSize: 13,
+        padding: "3px 8px", borderRadius: 6,
       }}>??%</div>
     </div>
   );
@@ -128,7 +128,7 @@ function MoreMatchesRow({ allMatches, lockFn, onReveal, hasUser, onSelect, activ
         <div style={{ fontFamily: "'Fredoka'", fontSize: "clamp(13px, 3.5vw, 16px)", fontWeight: 700, color: C.white }}>
           Also looks like...
         </div>
-        <div style={{ fontFamily: "'Oxanium'", fontSize: 9, fontWeight: 600, color: "rgba(255,255,255,0.3)" }}>
+        <div style={{ fontFamily: "'Oxanium'", fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.4)" }}>
           {TOTAL_MORE}+ matches
         </div>
       </div>
@@ -153,25 +153,25 @@ function MoreMatchesRow({ allMatches, lockFn, onReveal, hasUser, onSelect, activ
         {/* Teaser SEE ALL */}
         <div className="match-card" style={{
           flexShrink: 0, scrollSnapAlign: "start",
-          width: 120, height: 180, borderRadius: 16,
+          width: 138, height: 196, borderRadius: 16,
           background: `linear-gradient(145deg, ${C.yellow}, #FFD000)`,
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
-          gap: "clamp(4px, 4%, 8px)", padding: "10% 8%",
+          gap: 8, padding: "14px 12px",
           cursor: "pointer", textAlign: "center",
         }}>
-          <svg width={42} height={15} viewBox="0 0 60 20">
+          <svg width={48} height={18} viewBox="0 0 60 20">
             <text x="30" y="16" textAnchor="middle" fontFamily="'Fredoka',sans-serif" fontWeight="700"
               fontSize="18" fill={C.black} paintOrder="stroke">celebs</text>
           </svg>
-          <div style={{ fontFamily: "'Oxanium'", fontWeight: 700, fontSize: "clamp(7px, 7%, 10px)", color: C.black, lineHeight: 1.3 }}>
+          <div style={{ fontFamily: "'Oxanium'", fontWeight: 700, fontSize: 11, color: C.black, lineHeight: 1.3 }}>
             <strong>{TOTAL_MORE}+</strong> celebs
           </div>
           <div style={{
             background: C.black, color: C.yellow,
-            fontFamily: "'Oxanium'", fontWeight: 800, fontSize: "clamp(7px, 7%, 10px)",
-            padding: "clamp(3px, 3%, 6px) clamp(8px, 8%, 14px)",
-            borderRadius: 7, letterSpacing: 0.6, textTransform: "uppercase",
+            fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 11,
+            padding: "5px 12px",
+            borderRadius: 8, letterSpacing: 0.7, textTransform: "uppercase",
           }}>SEE ALL</div>
         </div>
       </div>
@@ -181,8 +181,8 @@ function MoreMatchesRow({ allMatches, lockFn, onReveal, hasUser, onSelect, activ
 
 function MatchCard({ celeb, rank, large = false, onSelect, isActive }) {
   const [h, setH] = useState(false);
-  const w  = large ? 150 : 120;
-  const ht = large ? 210 : 180;
+  const w  = large ? 168 : 138;
+  const ht = large ? 232 : 196;
   const highlighted = isActive;
   return (
     <div
@@ -211,32 +211,32 @@ function MatchCard({ celeb, rank, large = false, onSelect, isActive }) {
 
       {/* Top-left: VIEWING badge or rank */}
       <div style={{
-        position: "absolute", top: 6, left: 6, zIndex: 2,
-        background: highlighted ? celeb.color : RANK_COLORS[rank] || "rgba(255,255,255,0.12)",
+        position: "absolute", top: 7, left: 7, zIndex: 2,
+        background: highlighted ? celeb.color : RANK_COLORS[rank] || "rgba(255,255,255,0.14)",
         color: highlighted ? C.black : (RANK_TEXT[rank] || C.white),
-        fontFamily: "'Oxanium'", fontWeight: 800, fontSize: "clamp(5px, 5.5%, 7px)",
-        padding: "2px 6px", borderRadius: 4, letterSpacing: 0.5, textTransform: "uppercase",
+        fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 10,
+        padding: "3px 8px", borderRadius: 5, letterSpacing: 0.6, textTransform: "uppercase",
         boxShadow: highlighted ? `0 0 8px ${celeb.color}66` : (rank <= 1 ? `0 0 6px ${RANK_COLORS[rank]}66` : "none"),
       }}>{highlighted ? "VIEWING" : (RANK_LABELS[rank] || `#${rank + 1}`)}</div>
 
       {/* Top-right: percentage badge */}
       <div style={{
-        position: "absolute", top: 6, right: 6, zIndex: 2,
-        background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)",
+        position: "absolute", top: 7, right: 7, zIndex: 2,
+        background: "rgba(0,0,0,0.65)", backdropFilter: "blur(8px)",
         color: highlighted ? celeb.color : "#fff",
-        fontFamily: "'Fredoka'", fontWeight: 700, fontSize: "clamp(8px, 8%, 13px)",
-        padding: "2px 6px", borderRadius: 5,
+        fontFamily: "'Fredoka'", fontWeight: 700, fontSize: 14,
+        padding: "3px 8px", borderRadius: 6,
       }}>{celeb.pct}%</div>
 
       {/* Bottom content strip — name + action button */}
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 2,
-        padding: "clamp(6px, 6%, 12px) 6px",
-        display: "flex", flexDirection: "column", gap: "clamp(2px, 2%, 5px)",
+        padding: "10px 9px 9px",
+        display: "flex", flexDirection: "column", gap: 4,
       }}>
         {/* Celebrity name */}
         <div style={{
-          fontFamily: "'Oxanium'", fontSize: "clamp(8px, 8%, 11px)",
+          fontFamily: "'Oxanium'", fontSize: 12.5,
           fontWeight: 700, color: "#fff",
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           lineHeight: 1.2,
@@ -244,26 +244,26 @@ function MatchCard({ celeb, rank, large = false, onSelect, isActive }) {
         {/* Action row: rank label + play button */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{
-            fontFamily: "'Oxanium'", fontWeight: 800, fontSize: "clamp(6px, 5.5%, 8px)",
-            color: highlighted ? celeb.color : "rgba(255,255,255,0.5)",
-            letterSpacing: 0.4, textTransform: "uppercase", lineHeight: 1,
+            fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 9.5,
+            color: highlighted ? celeb.color : "rgba(255,255,255,0.55)",
+            letterSpacing: 0.5, textTransform: "uppercase", lineHeight: 1,
           }}>{RANK_LABELS[rank] || `#${rank + 1} MATCH`}</div>
           {onSelect && (
             <div style={{
-              width: "clamp(16px, 14%, 22px)", height: "clamp(16px, 14%, 22px)", borderRadius: "50%",
+              width: 22, height: 22, borderRadius: "50%",
               background: celeb.color,
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: C.black, fontSize: "clamp(7px, 6%, 10px)", fontWeight: 700,
+              color: C.black, fontSize: 10, fontWeight: 700,
               flexShrink: 0,
               boxShadow: `0 0 8px ${celeb.color}66`,
             }}>▶</div>
           )}
           {!onSelect && highlighted && (
             <div style={{
-              width: "clamp(16px, 14%, 22px)", height: "clamp(16px, 14%, 22px)", borderRadius: "50%",
-              background: "rgba(255,255,255,0.12)",
+              width: 22, height: 22, borderRadius: "50%",
+              background: "rgba(255,255,255,0.14)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              color: celeb.color, fontSize: "clamp(7px, 6%, 10px)", fontWeight: 700,
+              color: celeb.color, fontSize: 10, fontWeight: 700,
               flexShrink: 0,
             }}>★</div>
           )}
