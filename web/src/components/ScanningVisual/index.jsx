@@ -37,7 +37,7 @@ export function ScanningVisual() {
         }}>🤳</div>
       </div>
       <div style={{ fontFamily: fonts.body, fontSize: 12, color: colors.black, textAlign: "center", lineHeight: 1.5, fontWeight: 600 }}>
-        Wait a second...<br />We're finding your Doppelganger
+        Wait a second...<br />We're finding your Lookalike
       </div>
       <div style={{ width: "60%", height: 4, borderRadius: 2, background: "rgba(0,0,0,0.15)", overflow: "hidden" }}>
         <div style={{ width: "100%", height: "100%", background: colors.black, borderRadius: 2, animation: "loadBar 2.5s ease-in-out infinite" }} />

@@ -2017,7 +2017,7 @@ function GenCard({ gen, onView, onLabelUpdate }) {
         {/* Celeb name — bottom (hidden when locked) */}
         <div style={{ position:"absolute", bottom:8, left:10, right:10, zIndex:4 }}>
           <div style={{ fontFamily:"'Oxanium'", fontSize:8, fontWeight:600, color:"rgba(255,255,255,0.4)", letterSpacing:1, textTransform:"uppercase" }}>
-            Doppelganger
+            {pct >= 90 ? "Doppelganger" : "Lookalike"}
           </div>
           <div style={{
             fontFamily:"'Fredoka'", fontWeight:700, fontSize:15, color:C.white, marginTop:1,
@@ -2128,7 +2128,7 @@ function EmptyState({ onNew }) {
         No generations yet
       </div>
       <div style={{ fontFamily: "'Oxanium'", fontSize: 14, color: "rgba(255,255,255,0.4)", maxWidth: 320, lineHeight: 1.6 }}>
-        Upload your first photo and find your celebrity Doppelganger. Your results will appear here.
+        Upload your first photo and find your celebrity lookalike. Your results will appear here.
       </div>
       <button onClick={onNew} style={{
         background: C.yellow, color: C.black,

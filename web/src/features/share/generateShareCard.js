@@ -118,20 +118,21 @@ export async function generateShareCard({ celeb, userPhotoUrl }) {
   ctx.textBaseline = "middle";
   ctx.fillText("LIVE  •  CELEBS  •  SUPER LOOKALIKE", pillX + 50, pillY + pillH / 2 + 1);
 
-  // ── 3. Headline ──
+  // ── 3. Headline (Doppelganger label only when ≥90 % match, else Lookalike) ──
+  const isDopp = (celeb.pct ?? 0) >= 90;
   ctx.textAlign = "center";
   ctx.fillStyle = C.white;
   ctx.font = "700 88px 'Fredoka', sans-serif";
   ctx.fillText("I FOUND MY", W / 2, 320);
 
-  // "DOPPELGANGER" — gradient yellow→cyan
+  // Big shimmer gradient label — yellow→cyan
   const textGrad = ctx.createLinearGradient(0, 360, 0, 460);
   textGrad.addColorStop(0,   C.yellow);
   textGrad.addColorStop(0.5, "#00E5FF");
   textGrad.addColorStop(1,   C.yellow);
   ctx.fillStyle = textGrad;
-  ctx.font = "700 110px 'Fredoka', sans-serif";
-  ctx.fillText("DOPPELGANGER", W / 2, 440);
+  ctx.font = `700 ${isDopp ? 110 : 130}px 'Fredoka', sans-serif`;
+  ctx.fillText(isDopp ? "DOPPELGANGER" : "LOOKALIKE", W / 2, 440);
 
   // Black shadow underline for legibility
   ctx.shadowColor   = "rgba(0,0,0,0.6)";

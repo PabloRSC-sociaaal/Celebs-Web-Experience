@@ -34,7 +34,7 @@ export function FinalCTA() {
           <div style={{ position: "relative", zIndex: 2 }}>
             <div style={{ fontSize: 52, marginBottom: 14 }}>🌟</div>
             <h2 style={{ fontFamily: fonts.display, fontSize: "clamp(36px, 5vw, 58px)", fontWeight: 700, color: colors.yellow, lineHeight: 1, textShadow: `3px 3px 0 ${colors.blue}` }}>
-              Ready to Meet<br />Your Doppelganger?
+              Ready to Meet<br />Your Lookalike?
             </h2>
             <p style={{ fontFamily: fonts.body, color: "rgba(255,255,255,0.55)", fontSize: 15, marginTop: 18, maxWidth: 440, margin: "18px auto 0", lineHeight: 1.6, fontWeight: 400 }}>
               Join over 12 million people who already found their celebrity doppelganger.

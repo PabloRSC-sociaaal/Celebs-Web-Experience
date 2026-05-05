@@ -27,7 +27,7 @@ export function Gallery() {
             Real Results, Real People
           </h2>
           <p style={{ fontFamily: fonts.body, color: "rgba(255,255,255,0.5)", marginTop: 8, fontSize: 14 }}>
-            See what our users discovered about their celebrity Doppelganger
+            See what our users discovered about their celebrity lookalike
           </p>
         </div>
         <div className="gallery-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, maxWidth: 860, margin: "0 auto" }}>
@@ -36,7 +36,7 @@ export function Gallery() {
           ))}
         </div>
         <div style={{ textAlign: "center", marginTop: 44 }}>
-          <Button size="lg" onClick={triggerUpload}>Find My Doppelganger</Button>
+          <Button size="lg" onClick={triggerUpload}>Find My Lookalike</Button>
         </div>
       </div>
     </section>

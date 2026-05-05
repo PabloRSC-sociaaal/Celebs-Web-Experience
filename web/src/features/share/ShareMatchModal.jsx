@@ -86,14 +86,14 @@ export function ShareMatchModal({ open, onClose, celeb, userPhotoUrl, userName =
   // Caption hides the celeb identity — that's the reveal at the link.
   const shareCaption = celeb.pct >= 90
     ? `🔥 ${celeb.pct}% match with my celebrity Doppelganger… can you guess who? 👀`
-    : `Just got a ${celeb.pct}% celebrity match 😅 Tap to see who and find yours →`;
+    : `Just got a ${celeb.pct}% celebrity lookalike 😅 Tap to see who and find yours →`;
 
   const handleNativeShare = async () => {
     if (!blob || !shareUrl) return;
     const file = new File([blob], "celebs-match.png", { type: "image/png" });
     const data = {
       files: [file],
-      title: "My Celebrity Doppelganger — Celebs",
+      title: "My Celebrity Lookalike — Celebs",
       text:  `${shareCaption}\n${shareUrl}`,
       url:   shareUrl,
     };

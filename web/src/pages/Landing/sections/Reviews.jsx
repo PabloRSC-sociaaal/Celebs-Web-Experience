@@ -10,7 +10,7 @@ import { useCtaUpload }  from "../../../hooks/useCtaUpload";
 const REVIEWS = [
   { name: "Sarah K.", text: "I can't believe how accurate it is! My whole family couldn't stop laughing.", stars: 5, match: "Shakira 94%" },
   { name: "James R.", text: "Most fun I've had online this year. Everyone at the office tried it.",        stars: 5, match: "Brad Pitt 87%" },
-  { name: "Laura M.", text: "Perfect icebreaker at parties. Everyone wants to know their Doppelganger.",  stars: 5, match: "Rihanna 91%" },
+  { name: "Laura M.", text: "Perfect icebreaker at parties. Everyone wants to know their lookalike.",  stars: 5, match: "Rihanna 91%" },
   { name: "Diego S.", text: "The AI is impressive. Tried old photos and current ones — always nails it!", stars: 4, match: "Messi 89%" },
 ];
 
@@ -85,7 +85,7 @@ export function Reviews() {
               boxShadow: `4px 4px 0 ${colors.black}`,
               transition: "all 0.2s",
             }}>
-              📸 Find My Doppelganger
+              📸 Find My Lookalike
             </div>
           </div>
         </div>

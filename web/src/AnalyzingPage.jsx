@@ -16,7 +16,7 @@ const STAGES = [
   { at: 45, icon: "⚖️", text: "Analysing proportions & symmetry...",   sub: "Computing geometric ratios in real-time" },
   { at: 62, icon: "🌍", text: "Searching 50,000+ celebrity profiles...", sub: "Scanning our global celebrity database" },
   { at: 79, icon: "🧮", text: "Calculating similarity scores...",       sub: "Running deep comparison algorithms" },
-  { at: 95, icon: "🎯", text: "Doppelganger found!",                    sub: "Preparing your personalised results..." },
+  { at: 95, icon: "🎯", text: "Lookalike found!",                       sub: "Preparing your personalised results..." },
 ];
 
 // Facial landmark dot positions (% of photo dimensions)

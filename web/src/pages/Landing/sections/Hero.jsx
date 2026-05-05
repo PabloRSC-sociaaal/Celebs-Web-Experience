@@ -136,14 +136,14 @@ export function HeroSection() {
             textShadow: `4px 4px 0 ${colors.black}, 8px 8px 0 rgba(0,0,0,0.15)`,
           }}>
             Find Your<br />Celebrity<br />
-            <span style={{ color: colors.white, textShadow: `3px 3px 0 ${colors.black}, 0 0 30px rgba(255,229,0,0.3)` }}>Doppelganger</span>
+            <span style={{ color: colors.white, textShadow: `3px 3px 0 ${colors.black}, 0 0 30px rgba(255,229,0,0.3)` }}>Lookalike</span>
           </h1>
 
           <p style={{
             fontSize: "clamp(13px, 1.6vw, 15px)", color: "rgba(255,255,255,0.75)",
             marginTop: 16, lineHeight: 1.65, maxWidth: 420, fontWeight: 400,
           }}>
-            Upload your selfie and our AI finds your celebrity Doppelganger in seconds. 4,000+ facial points. 100% free.
+            Upload your selfie and our AI finds your celebrity lookalike in seconds. 4,000+ facial points. 100% free.
           </p>
 
           <div className="hero-stats" style={{

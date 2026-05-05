@@ -321,7 +321,7 @@ export function LandingPage() {
           <div>
             <Logo size={18} />
             <p style={{ fontFamily: fonts.body, fontSize: 12, color: "rgba(255,255,255,0.35)", marginTop: 4, fontWeight: 400 }}>
-              The #1 AI Celebrity Doppelganger Platform
+              The #1 AI Celebrity Lookalike Platform
             </p>
           </div>
           <div className="footer-links" style={{ display: "flex", gap: 24 }}>

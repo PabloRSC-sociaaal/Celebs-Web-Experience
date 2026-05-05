@@ -243,7 +243,7 @@ export function HeroUpload({ onStartScan, onSpotlight }) {
           ✨ Great shot! Ready to find your match
         </div>
         <Button size="lg" onClick={() => onStartScan(croppedUrl)} style={{ width: "100%", display: "block", textAlign: "center" }}>
-          🔍 Find My Doppelganger
+          🔍 Find My Lookalike
         </Button>
         <div style={{ marginTop: 10, fontFamily: fonts.body, fontSize: 10, color: "rgba(255,255,255,0.2)" }}>
           Tap anywhere outside to cancel

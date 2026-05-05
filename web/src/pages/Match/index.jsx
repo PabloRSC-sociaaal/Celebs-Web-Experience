@@ -59,9 +59,9 @@ export function MatchPage() {
           <div style={{ fontSize: 56 }}>🔗</div>
           <h2 style={{ fontFamily: "'Fredoka'", color: C.white, fontSize: 24, margin: 0 }}>Link expired</h2>
           <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, maxWidth: 280, lineHeight: 1.6 }}>
-            This match showcase isn't available — but you can still find your own celebrity Doppelganger.
+            This match showcase isn't available — but you can still find your own celebrity lookalike.
           </p>
-          <button onClick={() => navigate("/")} style={primaryBtn}>📸 Find My Doppelganger</button>
+          <button onClick={() => navigate("/")} style={primaryBtn}>📸 Find My Lookalike</button>
         </div>
       </Shell>
     );
@@ -114,14 +114,14 @@ export function MatchPage() {
             fontSize: "clamp(22px, 7vw, 34px)",
             color: C.white, margin: 0, lineHeight: 1.1,
           }}>
-            {senderName ? `${senderName.split(" ")[0]} found their` : "Someone just found their"}<br />
+            {senderName ? `${senderName.split(" ")[0]} found their celebrity` : "Someone just found their celebrity"}<br />
             <span style={{
               background: `linear-gradient(90deg, ${C.yellow}, ${C.cyan}, ${C.yellow})`,
               backgroundSize: "200% auto",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               animation: "mpShim 3s linear infinite",
-            }}>Doppelganger</span>
+            }}>{isDoppelganger ? "Doppelganger" : "Lookalike"}</span>
           </h1>
         </div>
 
@@ -320,7 +320,7 @@ export function MatchPage() {
           cursor: "pointer", textTransform: "uppercase", letterSpacing: 1.2,
           animation: "mpPulse 2.4s ease-in-out infinite",
         }}>
-          📸 Find My Doppelganger
+          📸 Find My Lookalike
         </button>
 
         <p style={{

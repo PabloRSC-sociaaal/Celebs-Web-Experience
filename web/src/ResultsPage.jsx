@@ -87,7 +87,7 @@ function LockedCard({ celeb, rank, large = false, onReveal, hasUser }) {
           fontSize: "clamp(9px, 10%, 14px)", color: "#fff",
           lineHeight: 1.2,
         }}>
-          {hasUser ? "Doppelganger" : `#${rank + 1} Match`}
+          {hasUser ? (celeb.pct >= 90 ? "Doppelganger" : "Lookalike") : `#${rank + 1} Match`}
         </div>
         <button onClick={(e) => { e.stopPropagation(); onReveal(); }} style={{
           background: hasUser ? C.yellow : "#fff", color: C.black, border: "none",
@@ -393,7 +393,11 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
   }, []);
 
   const handleShare = (platform) => {
-    const text = encodeURIComponent(`I'm ${celeb.pct}% ${celeb.name}'s Doppelganger! 😱 Find yours at celebs.app`);
+    const text = encodeURIComponent(
+      celeb.pct >= 90
+        ? `I'm ${celeb.pct}% ${celeb.name}'s Doppelganger! 😱 Find yours at celebs.app`
+        : `${celeb.pct}% lookalike with ${celeb.name}! Find yours at celebs.app`
+    );
     const urls = { twitter: `https://twitter.com/intent/tweet?text=${text}`, whatsapp: `https://wa.me/?text=${text}` };
     if (urls[platform]) window.open(urls[platform], "_blank");
   };
@@ -796,7 +800,9 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
             <div style={{
               fontFamily: "'Oxanium'", fontSize: 10, fontWeight: 700, letterSpacing: 2.5,
               color: `${C.cyan}99`, textTransform: "uppercase", marginBottom: 6,
-            }}>{activeIdx === 0 ? "✦ Your Celebrity Doppelganger ✦" : `✦ Celebrity Match #${activeIdx + 1} ✦`}</div>
+            }}>{activeIdx === 0
+                ? `✦ Your Celebrity ${celeb.pct >= 90 ? "Doppelganger" : "Lookalike"} ✦`
+                : `✦ Celebrity Match #${activeIdx + 1} ✦`}</div>
             <div style={{
               fontFamily: "'Fredoka'", fontWeight: 700,
               fontSize: "clamp(28px, 8vw, 54px)",

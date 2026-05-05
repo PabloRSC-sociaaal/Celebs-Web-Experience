@@ -174,7 +174,7 @@ export function SharePage() {
               Want to see who you look like?
             </div>
             <div style={{ fontFamily: "'Oxanium'", fontSize: 11, color: "rgba(255,255,255,0.5)", lineHeight: 1.5, marginBottom: 12 }}>
-              Sign up free and discover your own celebrity Doppelganger!
+              Sign up free and discover your own celebrity lookalike!
             </div>
             {user ? (
               <button onClick={() => navigate("/dashboard")} style={ctaStyle}>
