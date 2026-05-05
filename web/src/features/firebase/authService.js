@@ -13,6 +13,7 @@ import {
   getAuth,
   signInWithPopup,
   GoogleAuthProvider,
+  OAuthProvider,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
@@ -35,6 +36,27 @@ function _setMockUser(user) {
 // ─── Production: Firebase Auth instance (tree-shaken in demo builds) ──────────
 export const auth = DEMO_MODE ? null : getAuth(firebaseApp);
 const googleProvider = DEMO_MODE ? null : new GoogleAuthProvider();
+const appleProvider  = DEMO_MODE ? null : (() => {
+  const p = new OAuthProvider("apple.com");
+  p.addScope("email");
+  p.addScope("name");
+  return p;
+})();
+
+/**
+ * Apple Sign-In is only available on Safari / iOS WebKit reliably.
+ * Other browsers can use it through Firebase popup but the experience
+ * is degraded and Apple may reject the OAuth flow.
+ */
+export function isAppleSignInAvailable() {
+  if (typeof window === "undefined") return false;
+  if (DEMO_MODE) return true; // surface the button so we can demo the flow
+  const ua = window.navigator?.userAgent || "";
+  const isApplePlatform = /iPhone|iPad|iPod|Macintosh/i.test(ua);
+  const isSafari = /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+  // Show on Apple platforms regardless of browser, plus Safari on any platform.
+  return isApplePlatform || isSafari;
+}
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -44,6 +66,15 @@ export function signInWithGoogle() {
     return Promise.resolve({ user: MOCK_USER });
   }
   return signInWithPopup(auth, googleProvider);
+}
+
+export function signInWithApple() {
+  if (DEMO_MODE) {
+    const user = { ...MOCK_USER, email: "demo+apple@celebs.app", displayName: "Apple Demo" };
+    _setMockUser(user);
+    return Promise.resolve({ user });
+  }
+  return signInWithPopup(auth, appleProvider);
 }
 
 export function signInWithEmail(email, password) {

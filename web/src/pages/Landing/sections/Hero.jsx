@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { colors, fonts } from "../../../design/tokens";
 import { useAppStore }   from "../../../store/appStore";
 import { HeroUpload }    from "../../../components/HeroUpload";
 import { Stars }         from "../../../components/Stars";
 import { Marquee }       from "../../../components/Marquee";
+import { AuthModal }     from "../../../features/auth/AuthModal";
 
 // ── Decorative celebrity silhouette w/ entry, idle float and AI-scan loop ──
 function HeroCeleb({ src, side = "left", style, enterDelay = 0, floatDelay = 0, scanDelay = 0 }) {
@@ -60,12 +62,47 @@ export function HeroSection() {
   const setPreloaded   = useAppStore(s => s.setPreloadedResult);
   const setSpotlight   = useAppStore(s => s.setSpotlight);
   const spotlight      = useAppStore(s => s.spotlight);
+  const user           = useAppStore(s => s.user);
 
-  const handleStartScan = (photoUrl) => {
+  // Funnel decision — for now we force a signup AT generation time. Once
+  // we A/B test the funnel this gate may move (later in the flow, after
+  // the result reveal, etc.). Keeping the trigger isolated here makes that
+  // future move a single-line change.
+  const [authOpen, setAuthOpen]         = useState(false);
+  const [pendingPhoto, setPendingPhoto] = useState(null);
+
+  const proceedToAnalyzing = (photoUrl) => {
     setSpotlight(false);
     setPhoto(photoUrl);
     setPreloaded(null);
     navigate("/analyzing");
+  };
+
+  const handleStartScan = (photoUrl) => {
+    if (user) {
+      proceedToAnalyzing(photoUrl);
+      return;
+    }
+    // Hold the photo, gate on signup, resume the moment auth succeeds.
+    setPendingPhoto(photoUrl);
+    setAuthOpen(true);
+  };
+
+  const handleAuthSuccess = () => {
+    setAuthOpen(false);
+    if (pendingPhoto) {
+      const photo = pendingPhoto;
+      setPendingPhoto(null);
+      // Defer one tick so the modal's exit animation doesn't overlap with
+      // the analyzing page's enter animation.
+      setTimeout(() => proceedToAnalyzing(photo), 30);
+    }
+  };
+
+  const handleAuthClose = () => {
+    setAuthOpen(false);
+    setPendingPhoto(null);
+    setSpotlight(false); // user backed out — clear the upload spotlight too
   };
 
   return (
@@ -184,6 +221,17 @@ export function HeroSection() {
       <div style={{ maxWidth: 1140, margin: "36px auto 0", width: "100%" }}>
         <Marquee />
       </div>
+
+      {/* Auth gate — renders only when the user tried to generate without
+          an account. Title pre-frames it as a 1-second step, not a wall. */}
+      <AuthModal
+        isOpen={authOpen}
+        onClose={handleAuthClose}
+        onSuccess={handleAuthSuccess}
+        initialMode="signup"
+        title="One last step"
+        subtitle="Save your match and protect your privacy. Takes one tap."
+      />
     </section>
   );
 }

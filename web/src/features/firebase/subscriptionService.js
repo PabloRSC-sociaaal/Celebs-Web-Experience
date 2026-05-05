@@ -1,60 +1,17 @@
 /**
- * subscriptionService.js — Firestore subscription listener + checkout helper
+ * subscriptionService.js — DEPRECATED, kept for backward-compatibility.
  *
- * In DEMO_MODE: all functions are no-ops or return empty values.
- * Per architecture.mdc, the checkout call goes through apiClient (fetch +
- * Bearer) — never via httpsCallable.
+ * The canonical payments module is now `features/payments/` — please
+ * import from there in new code:
+ *
+ *   import { isPremium, initSubscriptionListener, createCheckout } from "features/payments";
+ *
+ * This file just re-exports for the existing call sites. Once they're
+ * migrated, this shim can be deleted.
  */
 
-import { DEMO_MODE } from "../../config";
-import { getFirestore, doc, onSnapshot } from "firebase/firestore";
-import { firebaseApp } from "./app";
-import { apiFetch }    from "../../lib/apiClient";
-
-const db = getFirestore(firebaseApp);
-
-/**
- * Listen to the user's subscription status in real time.
- * Returns an unsubscribe function.
- */
-export function initSubscriptionListener(uid, callback) {
-  if (DEMO_MODE) {
-    callback(null); // no subscription in demo
-    return () => {};
-  }
-  return onSnapshot(
-    doc(db, "users", uid),
-    (snap) => {
-      const data = snap.data();
-      callback(data?.subscription ?? null);
-    },
-    (err) => {
-      console.warn("[subscription] listener error:", err);
-      callback(null);
-    },
-  );
-}
-
-/**
- * Create a Lemon Squeezy checkout URL for the given variant.
- * Returns the hosted checkout URL string.
- */
-export async function createCheckout(variantId) {
-  if (DEMO_MODE) {
-    console.info("[DEMO] createCheckout → no-op");
-    return "#";
-  }
-  const response = await apiFetch("/api/checkouts", {
-    method: "POST",
-    body: { variantId },
-  });
-  return response?.url;
-}
-
-/**
- * Check if a subscription object represents an active premium user.
- */
-export function isPremium(subscription) {
-  if (!subscription) return false;
-  return subscription.status === "active" || subscription.status === "on_trial";
-}
+export {
+  initSubscriptionListener,
+  isPremium,
+  createCheckout,
+} from "../payments";
