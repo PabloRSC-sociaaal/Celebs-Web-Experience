@@ -32,12 +32,18 @@ export const CELEBRITIES = {
 };
 
 // ── Demo user photos (Gallery before/after cards) ────────────────────────────
+// Each user portrait is paired with one celebrity in Gallery.jsx so every
+// 'YOU' side of the PolaroidCard is unique. Pairings are curated for
+// visual coherence (similar haircut / skin tone / vibe).
 export const USERS = {
-  user1: { path: "/samples/user1.jpg", status: STATUS.PLACEHOLDER, note: "Gallery card — before photo" },
-  user2: { path: "/samples/user2.jpg", status: STATUS.PLACEHOLDER, note: "Gallery card — before photo" },
-  user3: { path: "/samples/user3.jpg", status: STATUS.PLACEHOLDER, note: "Gallery card — before photo" },
-  user4: { path: "/samples/user4.jpg", status: STATUS.PLACEHOLDER, note: "Gallery card — before photo" },
-  user5: { path: "/samples/user5.jpg", status: STATUS.PLACEHOLDER, note: "Gallery card — before photo" },
+  user1: { path: "/samples/user1.png", status: STATUS.FINAL, note: "Gallery — paired with Michael B. Jordan" },
+  user2: { path: "/samples/user2.png", status: STATUS.FINAL, note: "Gallery — paired with Lisa (BLACKPINK)" },
+  user3: { path: "/samples/user3.png", status: STATUS.FINAL, note: "Gallery — paired with Timothée Chalamet" },
+  user4: { path: "/samples/user4.png", status: STATUS.FINAL, note: "Gallery — paired with Taylor Swift" },
+  user5: { path: "/samples/user5.png", status: STATUS.FINAL, note: "Gallery — paired with Henry Cavill" },
+  user6: { path: "/samples/user6.png", status: STATUS.FINAL, note: "Gallery — paired with Billie Eilish" },
+  user7: { path: "/samples/user7.png", status: STATUS.FINAL, note: "Gallery — paired with Selena Gomez" },
+  user8: { path: "/samples/user8.png", status: STATUS.FINAL, note: "Gallery — paired with Harry Styles" },
 };
 
 // ── SimilarityExplorer brackets (each bracket needs a pair of comparison images) ──
