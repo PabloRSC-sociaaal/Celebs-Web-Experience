@@ -149,8 +149,15 @@ function MoreMatchesRow({ allMatches, lockFn, onReveal, hasUser, onSelect, activ
       </div>
       <div style={{
         display: "flex", gap: 8,
-        overflowX: "auto", overflowY: "visible",
+        // CSS does not allow mixing `auto` on one axis with `visible` on the
+        // other. `overflowY: visible` was being silently promoted to `auto`
+        // in some browsers, which let the row's intrinsic width balloon to
+        // the sum of its cards and drag the whole page off-centre.
+        overflow: "auto hidden",
         padding: "4px 0 16px",
+        // Force flex item to shrink below its content width so the row
+        // stays at 100% of the parent and the cards scroll inside it.
+        minWidth: 0, maxWidth: "100%",
         scrollSnapType: "x mandatory",
         WebkitOverflowScrolling: "touch",
         scrollbarWidth: "none", msOverflowStyle: "none",
@@ -424,7 +431,10 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
       background: "#050812",
       display: "flex", flexDirection: "column", alignItems: "center",
       fontFamily: "'Oxanium', sans-serif",
-      overflowY: "auto", overflowX: "hidden",
+      // Single declaration — Safari treats mixed overflow-x/y on the same
+      // node as both `auto` which can leak horizontally on some Android
+      // browsers; `auto hidden` is the explicit, valid form.
+      overflow: "auto hidden",
       WebkitOverflowScrolling: "touch",
       // Safe areas — notch + home indicator
       paddingTop: "env(safe-area-inset-top, 0px)",
@@ -523,8 +533,9 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
       ))}
 
       {/* ── Content wrapper ── */}
-      <div style={{
+      <div className="res-content" style={{
         width: "100%", maxWidth: 640,
+        minWidth: 0,
         minHeight: "100dvh",
         // Generous mobile gutter so nothing kisses the screen edge.
         padding: "clamp(14px, 2vw, 36px) clamp(24px, 5.5vw, 40px) clamp(28px, 3vw, 36px)",
@@ -532,6 +543,7 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
         alignItems: "center",
         gap: "clamp(16px, 2vw, 22px)",
         zIndex: 1,
+        boxSizing: "border-box",
       }}>
 
         {/* ── Nav row: back + context badge ── */}
