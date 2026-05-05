@@ -120,17 +120,20 @@ export function MorphSlider({ userPhoto, celebPhoto, color }) {
         requestAnimationFrame(step);
       });
 
-      // Wait first, then loop the nudge while user is idle.
-      await new Promise(r => { hintRef.current = setTimeout(r, 2200); });
+      // Wait first, then loop a tiny, gentle wiggle around the default
+      // 0.65 position. Range only spans ~0.12 so it reads as a hint that
+      // 'this is draggable' without dragging the user's eye across the
+      // whole slider every few seconds.
+      await new Promise(r => { hintRef.current = setTimeout(r, 2400); });
       while (!cancelled && !hasInteracted) {
         setHinting(true);
-        await tweenTo(0.55, 900);
+        await tweenTo(0.72, 1100);
         if (cancelled || hasInteracted) break;
-        await tweenTo(0.15, 900);
+        await tweenTo(0.58, 1300);
         if (cancelled || hasInteracted) break;
-        await tweenTo(0.4,  600);
+        await tweenTo(0.65, 800);
         setHinting(false);
-        await new Promise(r => { hintRef.current = setTimeout(r, 3500); });
+        await new Promise(r => { hintRef.current = setTimeout(r, 4500); });
       }
       setHinting(false);
     };
@@ -237,8 +240,11 @@ export function MorphSlider({ userPhoto, celebPhoto, color }) {
               display: "flex", alignItems: "center", justifyContent: "center",
               cursor: "col-resize", zIndex: 20,
               boxShadow: `0 0 20px ${color}88`,
-              transition: dragging ? "none" : "left 0.05s",
-              animation: !hasInteracted && !dragging ? "morphHintRingP 1.6s ease-in-out infinite" : "none",
+              // No left-transition: the auto-hint tween already updates the
+              // position every animation frame; an extra 50 ms ease made the
+              // thumb lag behind the divider line, which read as 'broken'.
+              transition: "none",
+              animation: !hasInteracted && !dragging ? "morphHintRingP 2.4s ease-in-out infinite" : "none",
             }}
           >
             <svg width={20} height={14} viewBox="0 0 20 14">
@@ -275,8 +281,8 @@ export function MorphSlider({ userPhoto, celebPhoto, color }) {
 
       <style>{`
         @keyframes morphSpin       { to { transform: rotate(360deg); } }
-        @keyframes morphHintPulse  { 0%,100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 1; transform: scale(1.04); } }
-        @keyframes morphHintRingP  { 0%,100% { box-shadow: 0 0 20px ${color}88, 0 0 0 0 ${color}66; } 50% { box-shadow: 0 0 24px ${color}aa, 0 0 0 14px ${color}00; } }
+        @keyframes morphHintPulse  { 0%,100% { opacity: 0.45; } 50% { opacity: 0.85; } }
+        @keyframes morphHintRingP  { 0%,100% { box-shadow: 0 0 18px ${color}77, 0 0 0 0 ${color}44; } 50% { box-shadow: 0 0 22px ${color}99, 0 0 0 6px ${color}00; } }
       `}</style>
 
       <div style={{
