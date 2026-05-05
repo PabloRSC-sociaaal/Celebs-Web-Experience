@@ -679,97 +679,145 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
           )}
         </>) : needsPremium(celeb.pct) ? (<>
         {/* ─────────────────────────────────────────────────────────────
-            CASE B — REGISTERED + DOPPELGANGER + NOT PREMIUM:
-            Show score & "DOPPELGANGER" clearly, but hide identity
+            CASE B — REGISTERED + DOPPELGANGER + NOT PREMIUM
+            Above-the-fold reveal: blurred morph + GIANT % + Doppelganger
+            badge + 'Go Premium' CTA, all sized to fit a single mobile
+            viewport so the user understands at a glance that the locked
+            element is THE big result. Secondary detail (score bar, trait
+            chips, traits) is rendered below, only visible via scroll.
         ───────────────────────────────────────────────────────────── */}
-          {/* Hidden name with Doppelganger badge */}
-          <div style={{ textAlign: "center", animation: "slideUpResult 0.5s ease-out 0.2s both" }}>
-            <div style={{
-              fontFamily: "'Oxanium'", fontSize: 10, fontWeight: 700, letterSpacing: 2.5,
-              color: `${C.cyan}99`, textTransform: "uppercase", marginBottom: 6,
-            }}>✦ Your Celebrity Doppelganger ✦</div>
-            <div style={{
-              fontFamily: "'Fredoka'", fontWeight: 700,
-              fontSize: "clamp(28px, 8vw, 54px)",
-              letterSpacing: 1, lineHeight: 1.05,
-              color: "rgba(255,255,255,0.08)",
-              filter: "blur(10px)", userSelect: "none",
-              animation: "namePop 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.5s both",
-            }}>Who Is It?</div>
-          </div>
+          {/* Compact tagline (single line, small) */}
+          <div style={{
+            fontFamily: "'Oxanium'", fontSize: 10, fontWeight: 700, letterSpacing: 2.5,
+            color: `${C.cyan}99`, textTransform: "uppercase",
+            textAlign: "center",
+            animation: "slideUpResult 0.5s ease-out 0.2s both",
+          }}>✦ Your Celebrity Doppelganger ✦</div>
 
-          {/* Blurred morph + premium overlay */}
-          <div style={{ position: "relative", width: "100%", maxWidth: 460 }}>
-            <div className="res-slider-wrap" style={{
-              width: "100%",
-              animation: "resultsReveal 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.3s both",
-              filter: "blur(24px)", pointerEvents: "none", userSelect: "none",
+          {/* Hero locked card — fits in ~58vh on mobile */}
+          <div className="res-locked-hero" style={{
+            position: "relative", width: "100%",
+            maxWidth: 460,
+            aspectRatio: "1/1",
+            maxHeight: "min(58vh, 460px)",
+            animation: "resultsReveal 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.3s both",
+          }}>
+            {/* Blurred morph as atmosphere */}
+            <div style={{
+              position: "absolute", inset: 0,
+              filter: "blur(24px) brightness(0.6)",
+              pointerEvents: "none", userSelect: "none",
+              borderRadius: 24, overflow: "hidden",
             }}>
               <MorphSlider key={celeb.name} userPhoto={photo} celebPhoto={celebImg} color={celeb.color} />
             </div>
+
+            {/* Yellow halo behind the % — pure FOMO */}
+            <div style={{
+              position: "absolute", top: "50%", left: "50%",
+              transform: "translate(-50%,-50%)",
+              width: "70%", height: "70%", borderRadius: "50%",
+              background: `radial-gradient(circle, ${C.yellow}28 0%, transparent 70%)`,
+              filter: "blur(20px)", pointerEvents: "none",
+            }} />
+
+            {/* Centred reveal stack */}
             <div style={{
               position: "absolute", inset: 0,
               display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center", gap: 10,
-              borderRadius: 20, zIndex: 2,
+              alignItems: "center", justifyContent: "center",
+              gap: "clamp(6px, 1.4vh, 12px)",
+              padding: "5% 8%",
+              zIndex: 2, textAlign: "center",
             }}>
-              <div style={{ fontSize: 44 }}>👑</div>
+              {/* GIANT % — the unmistakable hero number */}
+              {phase === "details" && (
+                <div style={{
+                  fontFamily: "'Fredoka'", fontWeight: 700,
+                  fontSize: "clamp(72px, 22vw, 130px)",
+                  lineHeight: 0.9, letterSpacing: -2,
+                  textShadow: `0 0 28px ${C.yellow}88, 0 8px 24px rgba(0,0,0,0.45)`,
+                }}>
+                  <AnimatedPct target={celeb.pct} color={celeb.color} />
+                </div>
+              )}
+
+              {/* DOPPELGANGER pill — sits right under the % */}
               <div style={{
-                fontFamily: "'Fredoka', sans-serif", fontWeight: 700, fontSize: 18,
-                color: "#FFE500", textAlign: "center", lineHeight: 1.2,
-              }}>
-                Premium Exclusive
-              </div>
+                background: `linear-gradient(135deg, ${celeb.color}, ${C.yellow})`,
+                color: C.black,
+                fontFamily: "'Oxanium'", fontWeight: 800,
+                fontSize: "clamp(11px, 2.6vw, 14px)",
+                letterSpacing: 2, textTransform: "uppercase",
+                padding: "6px 16px", borderRadius: 999,
+                boxShadow: `0 0 22px ${celeb.color}66, 0 4px 14px rgba(0,0,0,0.45)`,
+                animation: "pulse 2s ease-in-out infinite",
+                whiteSpace: "nowrap",
+              }}>🔥 Doppelganger 🔥</div>
+
+              {/* Premium gate */}
               <div style={{
-                fontFamily: "'Oxanium', sans-serif", fontSize: 12,
-                color: "rgba(255,255,255,0.55)", textAlign: "center",
-                maxWidth: 260, lineHeight: 1.5,
+                fontFamily: "'Oxanium', sans-serif",
+                fontSize: "clamp(10px, 2.3vw, 12px)", fontWeight: 600,
+                color: "rgba(255,255,255,0.7)",
+                letterSpacing: 0.6, lineHeight: 1.4,
+                marginTop: 4, maxWidth: 260,
               }}>
-                Unlock Premium to reveal your Doppelganger's identity
+                👑 Premium reveals who you look like
               </div>
+
               <button
                 onClick={() => setShowPaywall(true)}
                 style={{
-                  background: "#FFE500", color: "#000", border: "none", borderRadius: 12,
-                  padding: "12px 28px", cursor: "pointer", marginTop: 4,
-                  fontFamily: "'Oxanium', sans-serif", fontWeight: 800, fontSize: 14,
-                  letterSpacing: 0.5,
-                  boxShadow: "0 8px 32px rgba(255,229,0,0.3)",
-                  transition: "transform 0.15s",
+                  background: C.yellow, color: C.black,
+                  border: `3px solid ${C.black}`, borderRadius: 14,
+                  padding: "clamp(10px, 1.8vh, 14px) clamp(20px, 5vw, 32px)",
+                  cursor: "pointer", marginTop: 4,
+                  fontFamily: "'Oxanium', sans-serif", fontWeight: 800,
+                  fontSize: "clamp(12px, 2.8vw, 14px)",
+                  letterSpacing: 0.8, textTransform: "uppercase",
+                  boxShadow: `4px 4px 0 ${C.black}, 0 0 32px ${C.yellow}55`,
+                  transition: "transform 0.15s, box-shadow 0.15s",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = "none"; }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.transform = "translate(-2px,-2px)";
+                  e.currentTarget.style.boxShadow = `6px 6px 0 ${C.black}, 0 0 40px ${C.yellow}77`;
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.transform = "none";
+                  e.currentTarget.style.boxShadow = `4px 4px 0 ${C.black}, 0 0 32px ${C.yellow}55`;
+                }}
               >
-                Go Premium →
+                👑 Go Premium →
               </button>
             </div>
           </div>
 
-          {/* VISIBLE score + Doppelganger badge — creates FOMO */}
+          {/* Subtle scroll cue — hints at the analysis below + the cards row */}
           {phase === "details" && (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, animation: "slideUpResult 0.6s ease-out both", width: "100%" }}>
-              <div style={{ fontFamily: "'Fredoka'", fontWeight: 700, fontSize: "clamp(56px, 13vw, 88px)", lineHeight: 1 }}>
-                <AnimatedPct target={celeb.pct} color={celeb.color} />
-              </div>
-              {/* DOPPELGANGER badge — big, unmissable */}
+            <div style={{
+              fontFamily: "'Oxanium'", fontSize: 10, fontWeight: 700,
+              color: "rgba(255,255,255,0.35)",
+              letterSpacing: 1.5, textTransform: "uppercase",
+              textAlign: "center", marginTop: -4,
+              animation: "slideUpResult 0.5s ease-out 0.6s both",
+            }}>
+              Top 5 % · scroll for analysis ↓
+            </div>
+          )}
+
+          {/* SECONDARY (scroll-only): score bar, trait chips, second CTA */}
+          {phase === "details" && (
+            <div style={{
+              display: "flex", flexDirection: "column", alignItems: "center",
+              gap: 10, width: "100%",
+              animation: "slideUpResult 0.6s ease-out 0.7s both",
+              marginTop: 4,
+            }}>
               <div style={{
-                background: `linear-gradient(135deg, ${celeb.color}, ${C.yellow})`,
-                color: C.black,
-                fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 14,
-                letterSpacing: 2, textTransform: "uppercase",
-                padding: "8px 24px", borderRadius: 12, marginTop: 6,
-                boxShadow: `0 0 20px ${celeb.color}66, 0 4px 12px rgba(0,0,0,0.4)`,
-                animation: "pulse 2s ease-in-out infinite",
-              }}>🔥 DOPPELGANGER 🔥</div>
-              <div style={{
-                fontFamily: "'Oxanium'", fontSize: 12, fontWeight: 600,
-                color: "rgba(255,255,255,0.4)", letterSpacing: 0.8, marginTop: 8,
-                textAlign: "center", lineHeight: 1.5, maxWidth: 280,
+                width: "min(300px, 78vw)", height: 7, borderRadius: 4,
+                background: "rgba(255,255,255,0.08)", overflow: "hidden",
               }}>
-                You're in the top 5%! Unlock Premium to discover who your celebrity twin is
-              </div>
-              {/* Score bar visible */}
-              <div style={{ width: "min(300px, 78vw)", height: 7, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden", marginTop: 10 }}>
                 <div style={{
                   height: "100%", borderRadius: 4,
                   background: `linear-gradient(90deg, ${C.blue}, ${celeb.color})`,
@@ -777,8 +825,7 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
                   transition: "width 1.8s cubic-bezier(0.25, 1, 0.5, 1)",
                 }} />
               </div>
-              {/* Trait badges visible */}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 10, maxWidth: 360 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", maxWidth: 360 }}>
                 {["Bone structure", "Eye spacing", "Jaw shape", "Facial symmetry", "Skin tone"].map((trait, i) => (
                   <div key={trait} style={{
                     background: `${celeb.color}18`, border: `1px solid ${celeb.color}44`,
@@ -789,12 +836,11 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
                   }}>✓ {trait}</div>
                 ))}
               </div>
-              {/* Second CTA for emphasis */}
               <button
                 onClick={() => setShowPaywall(true)}
                 style={{
                   background: "transparent", border: `2px solid ${C.yellow}`,
-                  borderRadius: 12, padding: "10px 24px", cursor: "pointer", marginTop: 12,
+                  borderRadius: 12, padding: "10px 24px", cursor: "pointer",
                   fontFamily: "'Oxanium', sans-serif", fontWeight: 800, fontSize: 13,
                   color: C.yellow, letterSpacing: 0.6,
                   transition: "all 0.2s",
