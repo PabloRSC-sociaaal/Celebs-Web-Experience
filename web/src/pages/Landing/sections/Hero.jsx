@@ -149,16 +149,20 @@ export function HeroSection() {
 
       <div className="hero-grid" style={{
         maxWidth: 1140, width: "100%", margin: "0 auto",
+        // Justify the two columns to opposite ends so on web the text feels
+        // anchored to the left and the upload widget anchored to the right
+        // — instead of both floating in the centre with awkward white space.
         display: "flex", gap: 48, alignItems: "center",
-        // When spotlight is active the upload widget needs to escape above the
-        // 1000 z-index overlay; otherwise stay above the decorative celebs (z 1).
+        justifyContent: "space-between",
         position: "relative", zIndex: spotlight ? 1002 : 3,
       }}>
-        {/* ── Left column: text ── */}
+        {/* ── Left column: text — explicitly left-justified at every width ── */}
         <div className="hero-left" style={{
-          flex: "1 1 50%", minWidth: 0,
+          flex: "1 1 0", minWidth: 0,
           animation: "slideUp 0.8s ease-out",
           display: "flex", flexDirection: "column",
+          alignItems: "flex-start",
+          textAlign: "left",
         }}>
           <div className="hero-badge" style={{
             display: "inline-block", background: "rgba(0,0,0,0.25)", borderRadius: 30,
