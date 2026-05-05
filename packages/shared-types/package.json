@@ -1,0 +1,16 @@
+{
+  "name": "@celebs/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DTOs shared between apps/web and apps/functions. Single source of truth for the request/response shapes documented in apps/functions/openapi.yaml.",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types":  "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    }
+  },
+  "files": ["src"]
+}

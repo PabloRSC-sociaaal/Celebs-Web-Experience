@@ -1,0 +1,19 @@
+# Root-level Netlify config — points the build at apps/web after the
+# monorepo restructure. The legacy auto-generated config in
+# apps/web/.netlify/netlify.toml has stale absolute paths; this file
+# overrides it because Netlify reads the deepest netlify.toml from the
+# repo root first.
+
+[build]
+  base    = "apps/web"
+  command = "npm run build"
+  publish = "apps/web/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback — React Router handles unknown paths client-side.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

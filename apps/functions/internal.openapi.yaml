@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: Celebs Internal Webhooks
+  version: 0.1.0
+  description: |
+    Inbound-webhook surface served by the `internal` Express export in
+    functions/index.js. Mounted at
+    https://us-central1-<project>.cloudfunctions.net/internal/api.
+
+    There is NO shared auth middleware on this surface — each route
+    validates its own per-service signature before doing any work, per
+    architecture.mdc. Never invent a second auth mechanism (no API keys
+    for user routes, no bearer tokens here).
+
+    This file is the source of truth for the /internal/api/webhooks
+    surface. Any route change requires a matching update in the same
+    commit.
+
+servers:
+  - url: https://us-central1-{project}.cloudfunctions.net/internal/api
+    description: Production
+    variables:
+      project:
+        default: celebs-prod
+  - url: http://localhost:5001/{project}/us-central1/internal/api
+    description: Local Firebase emulator
+    variables:
+      project:
+        default: celebs-dev
+
+components:
+  securitySchemes:
+    lemonSqueezySignature:
+      type: apiKey
+      in: header
+      name: X-Signature
+      description: |
+        HMAC-SHA256 hex digest of the raw request body, computed with the
+        LEMON_SQUEEZY_WEBHOOK_SECRET shared with Lemon Squeezy.
+        Verified with crypto.timingSafeEqual; mismatches return 401.
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+
+    LemonSqueezyEnvelope:
+      type: object
+      required: [meta, data]
+      properties:
+        meta:
+          type: object
+          required: [event_name]
+          properties:
+            event_name:
+              type: string
+              enum:
+                - subscription_created
+                - subscription_updated
+                - subscription_cancelled
+                - subscription_expired
+              description: |
+                Other event names are accepted but ignored (200 OK with
+                'ignored event'). Only the four above mutate Firestore.
+            custom_data:
+              type: object
+              required: [firebase_uid]
+              properties:
+                firebase_uid:
+                  type: string
+                  description: |
+                    Echoed back from the createCheckout payload. Without
+                    this we cannot route the event to a user document —
+                    handler responds 200 OK 'no uid' and no-ops.
+        data:
+          type: object
+          required: [id, attributes]
+          properties:
+            id: { type: string }
+            attributes:
+              type: object
+              properties:
+                status:        { type: string }
+                variant_id:    { type: [string, integer] }
+                customer_id:   { type: [string, integer] }
+                renews_at:
+                  type: string
+                  format: date-time
+                  nullable: true
+
+paths:
+  /internal/api/webhooks/lemon-squeezy:
+    post:
+      summary: Lemon Squeezy subscription lifecycle webhook.
+      description: |
+        Validates the X-Signature header against the raw body, then for
+        the four handled event names writes the resulting subscription
+        snapshot to Firestore at users/{firebase_uid}.subscription:
+
+          { status, variantId, subscriptionId, customerId,
+            currentPeriodEnd, updatedAt: serverTimestamp }
+
+        Web clients listen to that document via onSnapshot in
+        features/payments/subscription.js to keep the paywall reactive.
+      tags: [webhooks]
+      security:
+        - lemonSqueezySignature: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LemonSqueezyEnvelope' }
+      responses:
+        '200':
+          description: Event processed (or intentionally ignored).
+          content:
+            text/plain:
+              schema: { type: string, example: OK }
+        '401':
+          description: Missing or invalid HMAC signature.
+          content:
+            text/plain:
+              schema: { type: string, example: Invalid signature }
+        '500':
+          description: Firestore write failed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }

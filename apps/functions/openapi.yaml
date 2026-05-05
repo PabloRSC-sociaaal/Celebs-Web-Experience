@@ -1,0 +1,214 @@
+openapi: 3.1.0
+info:
+  title: Celebs API
+  version: 0.1.0
+  description: |
+    Authenticated user-facing surface served by the `api` Express export
+    in functions/index.js. Mounted at https://us-central1-<project>.cloudfunctions.net/api.
+
+    All routes require a Firebase ID token in `Authorization: Bearer <token>`.
+    The middleware (functions/src/middleware/auth.middleware.js) verifies the
+    token and writes the decoded uid to res.locals.uid — handlers MUST NOT
+    read identity from the request body.
+
+    This file is the source of truth for the /api surface. Any route change
+    (new endpoint, renamed path, changed request/response shape) requires a
+    matching update to this file in the same commit.
+
+servers:
+  - url: https://us-central1-{project}.cloudfunctions.net/api
+    description: Production
+    variables:
+      project:
+        default: celebs-prod
+  - url: http://localhost:5001/{project}/us-central1/api
+    description: Local Firebase emulator
+    variables:
+      project:
+        default: celebs-dev
+
+components:
+  securitySchemes:
+    firebaseIdToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase Auth ID token. Obtain via `getIdToken(user)` on the web client.
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Human-readable failure reason.
+
+    HealthResponse:
+      type: object
+      required: [status, uid]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        uid:
+          type: string
+          description: The authenticated user's uid (echoed back for sanity).
+
+    GenerateComparisonRequest:
+      type: object
+      required: [comparisonId, base64Image]
+      properties:
+        comparisonId:
+          type: string
+          description: Client-generated UUID; idempotency key for retries.
+        base64Image:
+          type: string
+          description: Face-cropped photo, base64 (no `data:...,` prefix).
+          format: byte
+        embeddings:
+          type: array
+          items: { type: number }
+          description: Reserved for future use; pass `[]`.
+        describePicture:
+          type: boolean
+          default: true
+        enrich:
+          type: boolean
+          default: true
+
+    CelebrityMatch:
+      type: object
+      required: [name, score, celebrityId, comparisonId, imageData]
+      properties:
+        name:        { type: string }
+        score:       { type: number, format: float, minimum: 0, maximum: 100, description: 0–100 similarity score; client rounds via Math.round. }
+        celebrityId: { type: string }
+        comparisonId: { type: string }
+        imageData:
+          type: object
+          required: [url]
+          properties:
+            url:
+              type: string
+              format: uri
+              description: CORS-enabled URL of the celebrity portrait. The web morph slider draws this on canvas via `crossOrigin=anonymous`.
+            age:        { type: [string, integer], nullable: true }
+            gender:     { type: string, nullable: true }
+            ethnicity:  { type: string, nullable: true }
+            emotion:    { type: string, nullable: true }
+
+    GenerateComparisonResponse:
+      type: object
+      required: [matches]
+      properties:
+        matches:
+          type: array
+          minItems: 1
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/CelebrityMatch'
+
+    CreateCheckoutRequest:
+      type: object
+      required: [variantId]
+      properties:
+        variantId:
+          type: string
+          description: Lemon Squeezy variant ID (monthly or annual).
+
+    CreateCheckoutResponse:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Hosted checkout URL — top-level navigate the client there.
+
+security:
+  - firebaseIdToken: []
+
+paths:
+  /api/health:
+    get:
+      summary: Liveness check that also confirms auth is wired.
+      tags: [meta]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HealthResponse' }
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/comparisons/generate:
+    post:
+      summary: Run a celebrity-lookalike comparison for the authenticated user.
+      tags: [comparisons]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GenerateComparisonRequest' }
+      responses:
+        '200':
+          description: Up to five matches sorted by score desc.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GenerateComparisonResponse' }
+        '400':
+          description: Missing comparisonId or base64Image.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422':
+          description: No face detected or no celebrity matches found.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: Backend failure.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+
+  /api/checkouts:
+    post:
+      summary: Create a Lemon Squeezy hosted checkout for the authenticated user.
+      tags: [payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCheckoutRequest' }
+      responses:
+        '200':
+          description: Hosted checkout URL ready to navigate to.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CreateCheckoutResponse' }
+        '400':
+          description: Missing variantId.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401':
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '500':
+          description: Lemon Squeezy API call failed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }

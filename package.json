@@ -2,17 +2,18 @@
   "name": "celebs",
   "version": "0.1.0",
   "private": true,
-  "description": "Celebs — Celebrity Doppelganger Platform",
+  "description": "Celebs — Celebrity Lookalike Platform",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev":        "npm run dev --prefix web",
-    "dev:api":    "npm run dev --prefix api",
-    "dev:all":    "concurrently \"npm run dev\" \"npm run dev:api\"",
-    "build":      "npm run build --prefix web",
-    "preview":    "npm run preview --prefix web",
-    "install:all": "npm i --prefix web && npm i --prefix api && npm i --prefix functions",
-    "setup": "npm install && npm run install:all"
+    "dev":         "npm run dev   --workspace apps/web",
+    "build":       "npm run build --workspace apps/web",
+    "preview":     "npm run preview --workspace apps/web",
+    "lint":        "npm run lint  --workspace apps/web",
+    "emulate":     "firebase emulators:start --only functions,firestore,auth",
+    "install:all": "npm install"
   },
-  "devDependencies": {
-    "concurrently": "^9.1.2"
-  }
+  "devDependencies": {}
 }
