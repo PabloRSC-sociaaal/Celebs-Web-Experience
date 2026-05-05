@@ -527,7 +527,7 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
         width: "100%", maxWidth: 640,
         minHeight: "100dvh",
         // Generous mobile gutter so nothing kisses the screen edge.
-        padding: "clamp(12px, 2vw, 36px) clamp(20px, 4.5vw, 32px) clamp(20px, 2.5vw, 32px)",
+        padding: "clamp(14px, 2vw, 36px) clamp(24px, 5.5vw, 40px) clamp(28px, 3vw, 36px)",
         display: "flex", flexDirection: "column",
         alignItems: "center",
         gap: "clamp(16px, 2vw, 22px)",
