@@ -492,11 +492,12 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
           .res-slider-wrap { max-width: 62vw !important; }
         }
 
-        /* Mobile: compact action buttons */
+        /* Mobile: roomy action buttons so the stack breathes */
         @media(max-width:480px) {
-          .res-actions { gap:6px !important; }
-          .res-actions button { padding:10px 0 !important; font-size:12px !important; }
-          .res-share-row button { padding:8px 10px !important; }
+          .res-actions { gap:12px !important; }
+          .res-actions button { padding:13px 0 !important; font-size:13px !important; }
+          .res-share-row { gap:10px !important; }
+          .res-share-row button { padding:11px 12px !important; }
         }
       `}</style>
 
@@ -525,10 +526,11 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
       <div style={{
         width: "100%", maxWidth: 640,
         minHeight: "100dvh",
-        padding: "clamp(8px, 2vw, 36px) max(14px, 3vw) clamp(12px, 2vw, 24px)",
+        // Generous mobile gutter so nothing kisses the screen edge.
+        padding: "clamp(12px, 2vw, 36px) clamp(20px, 4.5vw, 32px) clamp(20px, 2.5vw, 32px)",
         display: "flex", flexDirection: "column",
         alignItems: "center",
-        gap: "clamp(6px, 1.5vw, 20px)",
+        gap: "clamp(16px, 2vw, 22px)",
         zIndex: 1,
       }}>
 
