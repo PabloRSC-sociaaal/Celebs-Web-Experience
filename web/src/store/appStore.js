@@ -6,8 +6,9 @@
 // ─────────────────────────────────────────────────────────
 
 import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
 
-export const useAppStore = create((set) => ({
+export const useAppStore = create(persist((set) => ({
   // User-uploaded photo (blob URL)
   uploadedPhoto: null,
   setUploadedPhoto: (url) => set({ uploadedPhoto: url }),
@@ -67,5 +68,22 @@ export const useAppStore = create((set) => ({
     faceGeometry: null,
     apiResult: null,
     // user is kept intentionally — logout is explicit via signOutUser()
+  }),
+}), {
+  // Persist only the keys that actually survive a reload. Blob URLs and
+  // transient runtime state (spotlight, pendingFile, faceGeometry, etc.)
+  // are intentionally excluded. user/subscription come from Firebase
+  // listeners on rehydrate so we don't store them either.
+  name: "celebs-app-store-v1",
+  storage: createJSONStorage(() => localStorage),
+  partialize: (state) => ({
+    uploadedPhoto:    typeof state.uploadedPhoto === "string"
+                        && !state.uploadedPhoto.startsWith("blob:")
+                        ? state.uploadedPhoto : null,
+    preloadedResult:  state.preloadedResult,
+    apiResult:        state.apiResult,
+    returnContext:    state.returnContext,
+    dashSubPage:      state.dashSubPage,
+    hasDashboard:     state.hasDashboard,
   }),
 }));

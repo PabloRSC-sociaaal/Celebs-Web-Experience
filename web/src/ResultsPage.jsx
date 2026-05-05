@@ -431,10 +431,9 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
       background: "#050812",
       display: "flex", flexDirection: "column", alignItems: "center",
       fontFamily: "'Oxanium', sans-serif",
-      // Single declaration — Safari treats mixed overflow-x/y on the same
-      // node as both `auto` which can leak horizontally on some Android
-      // browsers; `auto hidden` is the explicit, valid form.
-      overflow: "auto hidden",
+      // Shorthand order is overflow-x, overflow-y: hide horizontal,
+      // allow vertical scroll for the long results page.
+      overflow: "hidden auto",
       WebkitOverflowScrolling: "touch",
       // Safe areas — notch + home indicator
       paddingTop: "env(safe-area-inset-top, 0px)",
@@ -480,14 +479,14 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
         /* Mobile: keep the morph slider compact, but cards stay generous so
            text and the % pill aren't clipped — show ~2 cards + peek. */
         @media(max-width:480px) {
-          .res-slider-wrap { padding: 0 4px; max-width: 78vw !important; }
+          .res-slider-wrap { padding: 0 4px; max-width: 78vw !important; margin: 0 auto !important; }
           .match-card       { width:164px !important; height:228px !important; }
           .match-card--large { width:188px !important; height:256px !important; }
         }
 
         /* Tiny phones (iPhone SE, etc.) — slightly smaller but still readable */
         @media(max-width:380px) {
-          .res-slider-wrap { max-width: 78vw !important; }
+          .res-slider-wrap { max-width: 78vw !important; margin: 0 auto !important; }
           .match-card       { width:154px !important; height:214px !important; }
           .match-card--large { width:176px !important; height:240px !important; }
         }
