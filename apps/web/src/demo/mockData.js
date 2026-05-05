@@ -111,13 +111,13 @@ export const MOCK_CELEB_RESULTS = [
   },
 ];
 
-// Mock user — misma forma que un Firebase User object
+// Mock user — same shape as a Firebase User object
 export const MOCK_USER = {
   uid:         "demo-user-001",
   email:       "demo@celebs.app",
   displayName: "Demo User",
   photoURL:    null,
-  isDemo:      true,   // flag extra para identificarlo en dev tools
+  isDemo:      true,   // extra flag so we can spot it in dev tools
 };
 
 // Simulated API latency in ms (min, max)
