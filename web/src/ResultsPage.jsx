@@ -455,12 +455,11 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
           .res-logo { display:none; }
         }
 
-        /* Tablet+: secondary row no-wrap */
+        /* Tablet+: secondary row no-wrap. Cards stay at the JSX-default size
+           (172/144 px) which is just right beside the bigger morph slider. */
         @media(min-width:600px) {
           .res-second-row { flex-wrap:nowrap; }
           .res-second-row > button { flex:1 1 0; }
-          .match-card       { width:140px !important; height:200px !important; }
-          .match-card--large { width:170px !important; height:240px !important; }
         }
 
         /* Landscape phones: cap slider height */
@@ -468,18 +467,19 @@ export default function ResultsPage({ photo, onReset, onDashboard, preloaded = n
           .res-slider-wrap { max-width:260px !important; }
         }
 
-        /* Mobile: constrain slider so everything fits in viewport */
+        /* Mobile: keep the morph slider compact, but cards stay generous so
+           text and the % pill aren't clipped — show ~2 cards + peek. */
         @media(max-width:480px) {
-          .res-slider-wrap { padding: 0 4px; max-width: 52vw !important; }
-          .match-card       { width:88px !important; height:125px !important; }
-          .match-card--large { width:106px !important; height:148px !important; }
+          .res-slider-wrap { padding: 0 4px; max-width: 78vw !important; }
+          .match-card       { width:164px !important; height:228px !important; }
+          .match-card--large { width:188px !important; height:256px !important; }
         }
 
-        /* Tiny phones (iPhone SE, etc.) */
+        /* Tiny phones (iPhone SE, etc.) — slightly smaller but still readable */
         @media(max-width:380px) {
-          .res-slider-wrap { max-width: 50vw !important; }
-          .match-card       { width:76px !important; height:108px !important; }
-          .match-card--large { width:92px !important; height:130px !important; }
+          .res-slider-wrap { max-width: 78vw !important; }
+          .match-card       { width:154px !important; height:214px !important; }
+          .match-card--large { width:176px !important; height:240px !important; }
         }
 
         /* Short phones — squeeze more aggressively */
