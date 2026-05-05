@@ -32,8 +32,8 @@ const RANK_TEXT   = [C.black,  C.black,   C.white,  C.white,                  C.
 
 // ── Locked card wrapper — blur + lock overlay ────────────────────────────────
 function LockedCard({ celeb, rank, large = false, onReveal, hasUser }) {
-  const w  = large ? 168 : 138;
-  const ht = large ? 232 : 196;
+  const w  = large ? 172 : 144;
+  const ht = large ? 240 : 204;
   return (
     <div
       className={large ? "match-card match-card--large" : "match-card"}
@@ -65,27 +65,39 @@ function LockedCard({ celeb, rank, large = false, onReveal, hasUser }) {
           ? "radial-gradient(ellipse at 50% 60%, rgba(255,229,0,0.06) 0%, rgba(5,8,18,0.80) 70%)"
           : "radial-gradient(ellipse at 50% 60%, rgba(100,120,255,0.06) 0%, rgba(5,8,18,0.85) 70%)",
       }} />
-      {/* Rank badge — top-left */}
+      {/* Top-right: hidden % badge — single combined pill matching MatchCard */}
       <div style={{
-        position: "absolute", top: 7, left: 7, zIndex: 2,
-        background: "rgba(255,255,255,0.10)", backdropFilter: "blur(6px)",
-        color: "rgba(255,255,255,0.55)",
-        fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 10,
-        padding: "3px 8px", borderRadius: 5, letterSpacing: 0.6, textTransform: "uppercase",
-      }}>{RANK_LABELS[rank] || `#${rank + 1}`}</div>
+        position: "absolute", top: 8, right: 8, zIndex: 2,
+        display: "flex", alignItems: "center", gap: 5,
+        background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)",
+        padding: "4px 9px", borderRadius: 8,
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}>
+        <span style={{
+          fontFamily: "'Fredoka'", fontWeight: 700, fontSize: 14,
+          color: "rgba(255,255,255,0.4)", lineHeight: 1,
+        }}>??%</span>
+        <span style={{
+          fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 8,
+          color: "rgba(255,255,255,0.4)",
+          letterSpacing: 0.8, textTransform: "uppercase", lineHeight: 1,
+        }}>match</span>
+      </div>
+
       {/* Content — perfectly centered */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 1,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        gap: 8, padding: "14px 12px",
+        gap: 8, padding: "16px 12px 36px",
         textAlign: "center",
       }}>
         <div style={{ fontSize: large ? 32 : 28, lineHeight: 1 }}>{hasUser ? "👑" : "🔒"}</div>
         <div style={{
           fontFamily: "'Fredoka',sans-serif", fontWeight: 700,
-          fontSize: large ? 17 : 15, color: "#fff",
-          lineHeight: 1.2,
+          fontSize: large ? 16 : 14, color: "#fff",
+          lineHeight: 1.15,
+          maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis",
         }}>
           {hasUser ? (celeb.pct >= 90 ? "Doppelganger" : "Lookalike") : `#${rank + 1} Match`}
         </div>
@@ -103,14 +115,17 @@ function LockedCard({ celeb, rank, large = false, onReveal, hasUser }) {
           {hasUser ? "Premium →" : "Sign Up →"}
         </button>
       </div>
-      {/* Percentage badge — dimmed, top-right */}
+
+      {/* Bottom rank label — matches MatchCard layout */}
       <div style={{
-        position: "absolute", top: 7, right: 7, zIndex: 2,
-        background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)",
-        color: "rgba(255,255,255,0.45)",
-        fontFamily: "'Fredoka'", fontWeight: 700, fontSize: 13,
-        padding: "3px 8px", borderRadius: 6,
-      }}>??%</div>
+        position: "absolute", bottom: 10, left: 0, right: 0, zIndex: 2,
+        textAlign: "center",
+        fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 9.5,
+        color: "rgba(255,255,255,0.4)",
+        letterSpacing: 0.7, textTransform: "uppercase", lineHeight: 1,
+      }}>
+        {RANK_LABELS[rank] || `#${rank + 1} match`}
+      </div>
     </div>
   );
 }
@@ -153,7 +168,7 @@ function MoreMatchesRow({ allMatches, lockFn, onReveal, hasUser, onSelect, activ
         {/* Teaser SEE ALL */}
         <div className="match-card" style={{
           flexShrink: 0, scrollSnapAlign: "start",
-          width: 138, height: 196, borderRadius: 16,
+          width: 144, height: 204, borderRadius: 16,
           background: `linear-gradient(145deg, ${C.yellow}, #FFD000)`,
           display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
@@ -181,8 +196,8 @@ function MoreMatchesRow({ allMatches, lockFn, onReveal, hasUser, onSelect, activ
 
 function MatchCard({ celeb, rank, large = false, onSelect, isActive }) {
   const [h, setH] = useState(false);
-  const w  = large ? 168 : 138;
-  const ht = large ? 232 : 196;
+  const w  = large ? 172 : 144;
+  const ht = large ? 240 : 204;
   const highlighted = isActive;
   return (
     <div
@@ -207,66 +222,67 @@ function MatchCard({ celeb, rank, large = false, onSelect, isActive }) {
         onError={e => { e.target.style.display = "none"; }} />
 
       {/* Gradient overlay — bottom half for text readability */}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.3) 35%, transparent 55%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.45) 38%, transparent 60%)" }} />
 
-      {/* Top-left: VIEWING badge or rank */}
+      {/* Top-right: % match — single combined pill so we never collide with a left-side pill */}
       <div style={{
-        position: "absolute", top: 7, left: 7, zIndex: 2,
-        background: highlighted ? celeb.color : RANK_COLORS[rank] || "rgba(255,255,255,0.14)",
-        color: highlighted ? C.black : (RANK_TEXT[rank] || C.white),
-        fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 10,
-        padding: "3px 8px", borderRadius: 5, letterSpacing: 0.6, textTransform: "uppercase",
-        boxShadow: highlighted ? `0 0 8px ${celeb.color}66` : (rank <= 1 ? `0 0 6px ${RANK_COLORS[rank]}66` : "none"),
-      }}>{highlighted ? "VIEWING" : (RANK_LABELS[rank] || `#${rank + 1}`)}</div>
+        position: "absolute", top: 8, right: 8, zIndex: 2,
+        display: "flex", alignItems: "center", gap: 5,
+        background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)",
+        padding: "4px 9px", borderRadius: 8,
+        boxShadow: highlighted ? `0 0 8px ${celeb.color}66` : "0 2px 8px rgba(0,0,0,0.35)",
+        border: highlighted ? `1px solid ${celeb.color}` : "1px solid rgba(255,255,255,0.08)",
+      }}>
+        <span style={{
+          fontFamily: "'Fredoka'", fontWeight: 700, fontSize: 14,
+          color: highlighted ? celeb.color : "#fff",
+          lineHeight: 1,
+        }}>{celeb.pct}%</span>
+        <span style={{
+          fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 8,
+          color: "rgba(255,255,255,0.55)",
+          letterSpacing: 0.8, textTransform: "uppercase",
+          lineHeight: 1,
+        }}>match</span>
+      </div>
 
-      {/* Top-right: percentage badge */}
-      <div style={{
-        position: "absolute", top: 7, right: 7, zIndex: 2,
-        background: "rgba(0,0,0,0.65)", backdropFilter: "blur(8px)",
-        color: highlighted ? celeb.color : "#fff",
-        fontFamily: "'Fredoka'", fontWeight: 700, fontSize: 14,
-        padding: "3px 8px", borderRadius: 6,
-      }}>{celeb.pct}%</div>
+      {/* Top-left: ONLY the VIEWING indicator when active — otherwise blank */}
+      {highlighted && (
+        <div style={{
+          position: "absolute", top: 8, left: 8, zIndex: 2,
+          display: "flex", alignItems: "center", gap: 5,
+          background: celeb.color, color: C.black,
+          padding: "3px 8px", borderRadius: 999,
+          fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 9.5,
+          letterSpacing: 0.7, textTransform: "uppercase",
+          boxShadow: `0 0 10px ${celeb.color}88`,
+        }}>
+          <span style={{
+            width: 6, height: 6, borderRadius: "50%",
+            background: C.black,
+          }} />
+          Viewing
+        </div>
+      )}
 
-      {/* Bottom content strip — name + action button */}
+      {/* Bottom content strip — name + rank in a clean two-line stack */}
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 2,
-        padding: "10px 9px 9px",
-        display: "flex", flexDirection: "column", gap: 4,
+        padding: "10px 11px 10px",
+        display: "flex", flexDirection: "column", gap: 3,
       }}>
-        {/* Celebrity name */}
         <div style={{
-          fontFamily: "'Oxanium'", fontSize: 12.5,
+          fontFamily: "'Oxanium'", fontSize: large ? 14 : 13,
           fontWeight: 700, color: "#fff",
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           lineHeight: 1.2,
         }}>{celeb.name}</div>
-        {/* Action row: rank label + play button */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{
-            fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 9.5,
-            color: highlighted ? celeb.color : "rgba(255,255,255,0.55)",
-            letterSpacing: 0.5, textTransform: "uppercase", lineHeight: 1,
-          }}>{RANK_LABELS[rank] || `#${rank + 1} MATCH`}</div>
-          {onSelect && (
-            <div style={{
-              width: 22, height: 22, borderRadius: "50%",
-              background: celeb.color,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: C.black, fontSize: 10, fontWeight: 700,
-              flexShrink: 0,
-              boxShadow: `0 0 8px ${celeb.color}66`,
-            }}>▶</div>
-          )}
-          {!onSelect && highlighted && (
-            <div style={{
-              width: 22, height: 22, borderRadius: "50%",
-              background: "rgba(255,255,255,0.14)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: celeb.color, fontSize: 10, fontWeight: 700,
-              flexShrink: 0,
-            }}>★</div>
-          )}
+        <div style={{
+          fontFamily: "'Oxanium'", fontWeight: 800, fontSize: 9.5,
+          color: highlighted ? celeb.color : "rgba(255,255,255,0.5)",
+          letterSpacing: 0.6, textTransform: "uppercase", lineHeight: 1,
+        }}>
+          {RANK_LABELS[rank] || `#${rank + 1} match`}
         </div>
       </div>
     </div>
