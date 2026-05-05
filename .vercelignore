@@ -1,0 +1,12 @@
+# Vercel must NOT scan these — they are not part of the deployable static
+# site. apps/functions targets Firebase Cloud Functions (Express on Node)
+# and packages/shared-types is a workspace consumed at build time only.
+# Without this file Vercel auto-detects apps/functions/index.js and
+# crashes with FUNCTION_INVOCATION_FAILED at runtime.
+
+apps/functions
+packages
+firebase.json
+firestore.rules
+.firebase
+netlify.toml

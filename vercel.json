@@ -12,5 +12,6 @@
       "dev":  true,
       "main": false
     }
-  }
+  },
+  "functions": {}
 }
