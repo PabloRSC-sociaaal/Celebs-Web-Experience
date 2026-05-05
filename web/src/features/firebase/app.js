@@ -1,23 +1,29 @@
 /**
- * @STUB — Firebase app config (HARDCODED credentials — needs env var migration)
- * Status:    FUNCTIONAL but INSECURE — API keys hardcoded in source
- * Missing:   Move all config values to env vars (VITE_FIREBASE_*) via config/env.js
- * Priority:  P0 — hardcoded keys must not ship to production
- * Effort:    30min — read from config/env.js, add to .env, update .env.example
- *
  * app.js — Shared Firebase app instance "celebs"
- * Both auth and functions import from here.
+ * Both auth and the HTTP API client (via getIdToken) import from here.
+ *
+ * Configuration is read from env vars (see config/env.js). The dev defaults
+ * point at the demo Firebase project so the local box keeps working out of
+ * the box; production deploys MUST set VITE_FIREBASE_* in their environment.
  */
 
 import { initializeApp, getApps } from "firebase/app";
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_APP_ID,
+} from "../../config/env";
 
 const FIREBASE_CONFIG = {
-  apiKey:            "AIzaSyDaZ7_44sjR9bIfIUB-A8W_k836wk1jGdk",
-  authDomain:        "celebs-dev.firebaseapp.com",
-  projectId:         "celebs-dev",
-  storageBucket:     "celebs-dev.firebasestorage.app",
-  messagingSenderId: "836280488487",
-  appId:             "1:836280488487:web:2d952414e95fb5c46f3402",
+  apiKey:            FIREBASE_API_KEY,
+  authDomain:        FIREBASE_AUTH_DOMAIN,
+  projectId:         FIREBASE_PROJECT_ID,
+  storageBucket:     FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId:             FIREBASE_APP_ID,
 };
 
 export const firebaseApp =

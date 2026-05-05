@@ -2,16 +2,16 @@
  * subscriptionService.js — Firestore subscription listener + checkout helper
  *
  * In DEMO_MODE: all functions are no-ops or return empty values.
+ * Per architecture.mdc, the checkout call goes through apiClient (fetch +
+ * Bearer) — never via httpsCallable.
  */
 
 import { DEMO_MODE } from "../../config";
 import { getFirestore, doc, onSnapshot } from "firebase/firestore";
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { firebaseApp } from "./app";
+import { apiFetch }    from "../../lib/apiClient";
 
 const db = getFirestore(firebaseApp);
-const functions = getFunctions(firebaseApp, "us-central1");
-const createCheckoutFn = httpsCallable(functions, "createCheckoutUrl");
 
 /**
  * Listen to the user's subscription status in real time.
@@ -44,8 +44,11 @@ export async function createCheckout(variantId) {
     console.info("[DEMO] createCheckout → no-op");
     return "#";
   }
-  const result = await createCheckoutFn({ variantId });
-  return result.data.url;
+  const response = await apiFetch("/api/checkouts", {
+    method: "POST",
+    body: { variantId },
+  });
+  return response?.url;
 }
 
 /**
